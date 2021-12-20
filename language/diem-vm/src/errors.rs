@@ -44,6 +44,9 @@ pub fn convert_prologue_error(
     log_context: &impl LogContext,
 ) -> Result<(), VMStatus> {
     let status = error.into_vm_status();
+    dbg!("!!!!!!");
+
+    dbg!(&status);
 
     Err(match status {
         VMStatus::Executed => VMStatus::Executed,
