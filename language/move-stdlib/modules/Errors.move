@@ -16,23 +16,23 @@ address 0x1 {
 /// >TODO: determine what kind of stability guarantees we give about reasons/associated module.
 module Errors {
     /// A function to create an error from from a category and a reason.
-    fun make(_category: u8, reason: u64): u64 {
-        // (category as u64) + (reason << 8)
+    fun make(category: u8, reason: u64): u64 {
+        (category as u64) + (reason << 8)
         /////// 0L /////////
-        (reason as u64) // Changed error codes make to easily track them in 0L
+        // (reason as u64) // Changed error codes make to easily track them in 0L
     }
     spec make {
         pragma opaque = true;
-        ensures [concrete] result == reason; /////// 0L /////////
+        ensures [concrete] result == category + (reason << 8);
         aborts_if [abstract] false;
-        ensures [abstract] result == reason; /////// 0L /////////
+        ensures [abstract] result == category;
     }
     
-    /////// 0L /////////
-    /// A function to create an error from from a category and a reason.
-    fun make_ol(_category: u8, reason: u64): u64 {
-        (reason as u64)
-    }    
+    // /////// 0L /////////
+    // /// A function to create an error from from a category and a reason.
+    // fun make_ol(_category: u8, reason: u64): u64 {
+    //     (reason as u64)
+    // }    
 
     /// The system is in a state where the performed operation is not allowed. Example: call to a function only allowed
     /// in genesis.
@@ -145,16 +145,16 @@ module Errors {
         ensures result == CUSTOM;
     }
 
-    /////// 0L /////////
-    public fun ol_tx(reason: u64): u64 { make(OL_TX_ERR, reason) }
-    spec custom {
-        pragma opaque = true;
-        aborts_if false;
-        ensures result == CUSTOM;
-    }
+    // /////// 0L /////////
+    // public fun ol_tx(reason: u64): u64 { make(OL_TX_ERR, reason) }
+    // spec custom {
+    //     pragma opaque = true;
+    //     aborts_if false;
+    //     ensures result == CUSTOM;
+    // }
 
-    /////// 0L /////////
-    public fun ol(reason: u64): u64 { make(OL_ERR, reason) }        
+    // /////// 0L /////////
+    // public fun ol(reason: u64): u64 { make(OL_ERR, reason) }        
 }
 
 }
