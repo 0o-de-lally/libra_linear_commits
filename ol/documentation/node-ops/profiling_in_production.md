@@ -1,9 +1,8 @@
 
 # Non-intrusive stack sampling profiling with `prof`
-
-sudo apt install linux-oem-5.6-tools-common
-
 ## Install
+
+With sudo permissions, install:
 
 ```
 sudo apt install linux-oem-5.6-tools-common
