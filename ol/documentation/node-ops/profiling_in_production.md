@@ -14,14 +14,13 @@ sudo apt install linux-oem-5.6-tools-common
 # or
 sudo apt install linux-tools-5.4.0-81-generic
 
-# for call hierarchy report
+# for call hierarchy report 
 sudo apt install binutils 
 
 ```
 
 Your cloud vendor may have a different version of this. On google cloud it would be:
 ```
-linux-tools-5.11.0-1021-gcp
 linux-tools-gcp
 ```
 
@@ -41,4 +40,7 @@ sudo perf record -F 99 -p <pid> -g sleep 30
 Reporter:
 ```
 sudo perf report -n --stdio
+
+# or an alternate view (requires binutils)
+sudo perf report --hierarchy -M intel
 ```
