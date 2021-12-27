@@ -23,7 +23,19 @@ Your cloud vendor may have a different version of this. On google cloud it would
 ```
 linux-tools-gcp
 ```
+# Build binaries
+You'll need to rebuild the binaries. 0L releases binaries without debug symbols, to keep the binary size small. You'll need to rebuild with the `debug option enabled`.
 
+```
+# build the release from command line
+CARGO_PROFILE_RELEASE_DEBUG=true cargo build --release
+
+# or modify the rool level Cargo.toml 
+
+[profile.release]
+debug = true        # Include debug symbols
+
+```
 ## Profile
 
 get the PID of the diem-node process:
