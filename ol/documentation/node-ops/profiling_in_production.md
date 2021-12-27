@@ -8,12 +8,14 @@ https://rust-lang.github.io/packed_simd/perf-guide/prof/linux.html
 With sudo permissions, install:
 
 ```
-
+# install the tools which include `perf`
 sudo apt install linux-oem-5.6-tools-common
+
+# or
 sudo apt install linux-tools-5.4.0-81-generic
 
-#for call hierarchy report
-sudo apt instsall binutils 
+# for call hierarchy report
+sudo apt install binutils 
 
 ```
 
