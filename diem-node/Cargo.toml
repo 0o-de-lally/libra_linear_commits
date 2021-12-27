@@ -47,7 +47,3 @@ subscription-service = { path = "../common/subscription-service" }
 default = []
 assert-private-keys-not-cloneable = ["diem-crypto/assert-private-keys-not-cloneable"]
 failpoints = ["fail/failpoints", "consensus/failpoints", "executor/failpoints", "diem-json-rpc/failpoints", "diem-mempool/failpoints", "state-sync/failpoints"]
-
-
-[profile.release]
-debug = true
