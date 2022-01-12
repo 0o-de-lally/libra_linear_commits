@@ -90,7 +90,7 @@ pub fn what_ip() -> Result<Ipv4Addr, Error> {
         true => system_ip,
         false => {
             let input: String = Input::new()
-                .with_prompt("Enter the IP address of the node")
+                .with_prompt("Enter the IP address of the validator node")
                 .interact_text()
                 .unwrap();
             input
@@ -109,7 +109,7 @@ pub fn what_vfn_ip() -> Result<Ipv4Addr, Error> {
     }
 
     let input: String = Input::new()
-        .with_prompt("Enter the IP address of the node")
+        .with_prompt("Enter the IP address of the VFN (validator fullnode)")
         .interact_text()?;
 
     let ip = input.parse::<Ipv4Addr>()?;
