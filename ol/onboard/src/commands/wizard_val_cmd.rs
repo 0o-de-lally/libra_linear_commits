@@ -377,7 +377,7 @@ fn get_genesis_and_make_node_files(cmd: &ValWizardCmd, home_path: &PathBuf, _bas
   ) {
     Ok(_) => {},
     Err(e) => {
-      println!("Cannot create validator, exiting. Messsage: {:?}", &e);
+      println!("Could not write node config files, exiting. Messsage: {:?}", &e);
       exit(1);
     },
 };

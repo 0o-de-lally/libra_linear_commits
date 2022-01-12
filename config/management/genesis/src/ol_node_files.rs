@@ -286,7 +286,7 @@ pub fn make_fullnode_cfg(
     seed_addr: Option<SeedAddresses>,
     waypoint: Waypoint,
 ) -> Result<NodeConfig, anyhow::Error> {
-    let mut c = default_for_public_fullnode()?;
+    let mut c = NodeConfig::default();
     c.set_data_dir(output_dir.clone());
     c.base.waypoint = WaypointConfig::FromConfig(waypoint);
     c.base.role = RoleType::FullNode;
@@ -483,24 +483,6 @@ fn encode_validator_seed_for_vfn_discovery(
     let mut seeds = PeerSet::default();
     seeds.insert(validator_account, val_peer_data);
     Ok(seeds)
-}
-
-
-pub fn default_for_public_fullnode() -> Result<NodeConfig, anyhow::Error> {
-    let path_str = env!("CARGO_MANIFEST_DIR");
-    let path = PathBuf::from(path_str)
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .join("ol/util/node_templates/fullnode.node.yaml");
-
-    let contents = fs::read_to_string(&path)?;
-    let n: NodeConfig = serde_yaml::from_str(&contents)?;
-
-    Ok(n)
 }
 
 pub fn test_default_for_vfn() -> Result<NodeConfig, anyhow::Error> {
