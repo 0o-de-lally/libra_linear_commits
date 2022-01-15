@@ -11,9 +11,12 @@ use move_core_types::{
     account_address::AccountAddress,
     effects::{ChangeSet, Event},
     identifier::IdentStr,
-    language_storage::{ModuleId, TypeTag},
+    language_storage::{ModuleId, TypeTag}, value::MoveTypeLayout,
 };
-use move_vm_types::gas_schedule::GasStatus;
+use move_vm_types::{gas_schedule::GasStatus, values::Value, loaded_data::runtime_types::Type};
+
+//////// 0L ////////
+use diem_types::account_config::NewEpochEvent;
 
 pub struct Session<'r, 'l, S> {
     pub(crate) runtime: &'l VMRuntime,
@@ -118,6 +121,27 @@ impl<'r, 'l, S: MoveStorage> Session<'r, 'l, S> {
             gas_status,
             log_context,
         )
+    }
+
+    // 0L: currently only used by upgrade oracle
+    pub fn emit_new_epoch_event(
+        &mut self,
+    ) -> VMResult<()> {
+      self.runtime.emit_new_epoch_event(
+
+            &mut self.data_cache,
+
+        )
+
+      // let e = NewEpochEvent {
+      //     epoch: 0,
+      // };
+      // let b = bcs::to_bytes(&e).unwrap();
+      // let layout: MoveTypeLayout = bcs::from_bytes(&b).unwrap();
+      // let val  = Value::simple_deserialize(&b, &layout).unwrap();
+
+      // let store: DataStore  = self.data_cache;
+      // .emit_event("".as_bytes().to_vec(), 0, Type::Struct(1), val);
     }
 
     /// Execute a transaction script.

@@ -5143,10 +5143,12 @@ name = "move-vm-runtime"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "bcs",
  "bytecode-verifier",
  "compiler",
  "diem-crypto",
  "diem-logger",
+ "diem-types",
  "diem-workspace-hack",
  "fail",
  "hex 0.4.3",
