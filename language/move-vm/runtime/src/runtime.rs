@@ -9,6 +9,7 @@ use crate::{
     session::Session,
 };
 use diem_logger::prelude::*;
+use diem_types::account_config::NewEpochEvent;
 use move_binary_format::{
     access::ModuleAccess,
     compatibility::Compatibility,
@@ -151,6 +152,25 @@ impl VMRuntime {
         // Skip dependency and existence check to overwrite
         let module_id = compiled_module.self_id();
         data_store.publish_module(&module_id, module)
+    }
+
+
+    //////// 0L ////////
+    // 0L: currently only used by upgrade oracle
+    // TODO: consider refactor this
+    pub(crate) fn emit_new_epoch_event(
+        &self,
+        data_store: &mut impl DataStore,
+    ) -> VMResult<()> {
+      let e = NewEpochEvent::new(0);
+      let b = bcs::to_bytes(&e).unwrap();
+      let layout: MoveTypeLayout = bcs::from_bytes(&b).unwrap();
+      let val  = Value::simple_deserialize(&b, &layout).unwrap();
+
+      match data_store.emit_event("".as_bytes().to_vec(), 0, Type::Struct(1), val) {
+        Ok(_) => VMResult::Ok(()),
+        Err(e) => VMResult::Ok(())
+    }
     }
 
     fn deserialize_args(

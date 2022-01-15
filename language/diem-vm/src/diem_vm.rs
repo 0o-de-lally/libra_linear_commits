@@ -544,15 +544,6 @@ impl DiemVMImpl {
                 // ).expect("Couldn't reset upgrade payload");
 
                 // WIP rust trigger event.
-                // let e = NewEpochEvent {
-                //     epoch: 0,
-                // };
-                
-                // let b = bcs::to_bytes(&e).unwrap();
-                // let layout: MoveTypeLayout = bcs::from_bytes(&b).unwrap();
-                // let val  = Value::simple_deserialize(&b, &layout).unwrap();
-
-                // session.data_cache.emit_event("".as_bytes().to_vec(), 0, Type::Struct(1), val);
 
 
                 println!("==== stdlib upgrade: end upgrade at time: {} ====", timestamp);
