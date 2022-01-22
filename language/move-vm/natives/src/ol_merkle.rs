@@ -6,10 +6,9 @@ use move_vm_types::{
     natives::function::{native_gas, NativeContext, NativeResult},
     values::Value,
 };
-use sha2::{Digest, Sha256};
 use smallvec::smallvec;
-use std::collections::VecDeque;
-
+use std::{collections::VecDeque, iter::FromIterator};
+use smtree;
 
 pub fn verify_merkle_sha3(
     context: &impl NativeContext,
@@ -26,6 +25,10 @@ pub fn verify_merkle_sha3(
         NativeCostIndex::MERKLE,
         hash_arg.len(),
     );
+
+    // TODO: This is just scaffolding of the native function
+    // now need to implement smtree to verify here:
+    // https://crates.io/crates/smtree
 
     let hash_vec = HashValue::sha3_256_of(hash_arg.as_slice()).to_vec();
     Ok(NativeResult::ok(
