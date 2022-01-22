@@ -37,7 +37,7 @@ To manage gas for native functions, the `CostTable` object (defined in `language
 
 
 As of writing this guide, all tests are performed using the `zero_cost_schedule` in `move-vm`. The steps described are for this environment.
-1. Increment the total number of native functions by increasing the constant `NUMBER_OF_NATIVE_FUNCTIONS` in `language/vm/src/file_format.rs`. 
+1. Increment the total number of native functions by increasing the constant `NUMBER_OF_NATIVE_FUNCTIONS` in `language/move-binary-format/src/file_format.rs`. 
 > What does this do? `zero_cost_schedule` is initialized for native functions by making a table of length `NUMBER_OF_NATIVE_FUNCTIONS` with entries of zero. By increasing the size of this table (and the global constant for anywhere else it's used), you will avoid index_out_of_bounds errors since the `CostTable` is actually big enough.
 2. At the bottom of `language/move-vm/types/src/gas_schedule.rs`, add another entry to the enum which holds the indices for native functions. This will make it easier to access the proper table entry without having to remember the index.
 3. In `language/tools/vm-genesis/src/genesis_gas_schedule.rs`, add another elemen to the vector e.g. `(N::VDF_VERIFY, GasCost::new(1000000, 1))`.

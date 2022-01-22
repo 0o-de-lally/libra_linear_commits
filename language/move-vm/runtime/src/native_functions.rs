@@ -7,7 +7,7 @@ use move_core_types::{
     account_address::AccountAddress, gas_schedule::CostTable, language_storage::CORE_CODE_ADDRESS,
     value::MoveTypeLayout, vm_status::StatusType,
 };
-use move_vm_natives::{account, bcs, debug, event, hash, signature, signer, vector, vdf, ol_decimal}; //////// 0L ////////
+use move_vm_natives::{account, bcs, debug, event, hash, signature, signer, vector, vdf, ol_decimal, ol_merkle}; //////// 0L ////////
 use move_vm_types::{
     data_store::DataStore,
     gas_schedule::GasStatus,
@@ -51,6 +51,7 @@ pub(crate) enum NativeFunction {
     DecimalDemo,
     DecimalSingle,
     DecimalPair,
+    MerkleSha3,
 }
 
 impl NativeFunction {
@@ -89,6 +90,7 @@ impl NativeFunction {
             (&CORE_CODE_ADDRESS, "Decimal", "decimal_demo") => DecimalDemo,
             (&CORE_CODE_ADDRESS, "Decimal", "single_op") => DecimalSingle,
             (&CORE_CODE_ADDRESS, "Decimal", "pair_op") => DecimalPair,
+            (&CORE_CODE_ADDRESS, "Merkle", "verify_sha3") => MerkleSha3,
 
             _ => return None,
         })
@@ -129,6 +131,8 @@ impl NativeFunction {
             Self::DecimalDemo => ol_decimal::native_decimal_demo(ctx, t, v),
             Self::DecimalSingle => ol_decimal::native_decimal_single(ctx, t, v),
             Self::DecimalPair => ol_decimal::native_decimal_pair(ctx, t, v),
+            Self::MerkleSha3 => ol_merkle::verify_merkle_sha3(ctx, t, v),
+
         };
         debug_assert!(match &result {
             Err(e) => e.major_status().status_type() == StatusType::InvariantViolation,

@@ -1458,7 +1458,8 @@ pub enum Bytecode {
     Shr,
 }
 
-pub const NUMBER_OF_NATIVE_FUNCTIONS: usize = 21; //////// 0L ////////
+/// IMPORTANT: This count needs to be manually incremented whenever a native function is added.
+pub const NUMBER_OF_NATIVE_FUNCTIONS: usize = 22; //////// 0L ////////
 
 impl ::std::fmt::Debug for Bytecode {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
