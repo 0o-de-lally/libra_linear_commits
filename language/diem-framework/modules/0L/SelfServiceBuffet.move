@@ -8,9 +8,10 @@
 // themselves, and rampant abuse is minimized. But not all abuse. We assume
 // honesty. By default Workers will be paid some days after a request is made,
 // without intervention. Some attacks are possible, and that's explicitly ok,
-// because 100% coverage is impossible. It's not profitable to try to amplify
-// attacks because time delays and bonds kick in as for each new pending
-// payment in the system.
+// because 100% coverage is impossible, and certainly not worse than the amount
+// of free-riding that happens from proof-of-work mining rewards. It's not
+// profitable to try to amplify attacks because time delays and bonds kick in as
+// for each new pending payment in the system.
 
 // Games need to have an equilibrium. In any community the honest actors always
 // pay for the actions of bad actors. There's both monetary cost and demotivation,
