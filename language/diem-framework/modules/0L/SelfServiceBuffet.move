@@ -51,19 +51,25 @@ address 0x1 {
   module SelfService {
     use 0x1::GAS::GAS;
 
-    struct Balance has key {
-      value: GAS
-    }
-    struct Funders has key {
-      funder: vector<address>,
-      value: vector<u64>
+    // gets initialized to a worker account when they submit a request for payment.
+    struct Worker has key {
+      pending_value: u64,
+      pending_bond: u64,
+      cumulative_payment: u64,
     }
 
-    struct Police has key {
-      list: vector<address>
+    // gets initialized to the DAO address on init_dao()
+    struct Buffet has key {
+      balance: GAS,
+      funder_addr: vector<address>,
+      funder_value: vector<u64>,
+      police_list: vector<address>,
+      pending_payments: vector<Payment>,
+      max_uid: u64,
     }
 
     struct Payment has key, store {
+      uid: u64,
       worker: address,
       value: u64,
       epoch_requested: u64,
@@ -71,63 +77,63 @@ address 0x1 {
       bond: GAS,
       rejection: vector<address>
     }
-    struct PendingPayments has key {
-      list: vector<Payment>,
-    }
 
-    struct Worker has key {
-      pending_value: u64,
-      pending_bond: u64,
-      cumulative_payment: u64,
-    }
+
 
     ///////// WORKER FUNCTIONS ////////
 
-    public fun pay_me() {
+    public fun pay_me(_sender: &signer, _from_dao: address, _amount: u64, _deliverable: vector<u8>, _bond: u64) {
 
     }
 
     // Lazy computation. Payments need to be released by someone (there is no automatic scheduler).
     // Anyone who wants to get paid can submit the release all. It will release all payments for everyone that is due.
-    public fun release_all() {
+    public fun release_all(_sender: &signer, _from_dao: address) {
 
     }
 
     ////////// SPONSOR FUNCTIONS //////////
 
     // anyone can fund the pool. It doesn't give you any rights or governance.
-    public fun fund_it() {
+    public fun fund_it(_sender: &signer, _from_dao: address, amount: u64) {
 
     }
 
     ////////// MANAGMENT FUNCTIONS //////////
 
+    // a DAO can initialize their address with this state.
+    // all transactions in the future need to reference the DAO address
+    // this also creates the first Police address, which can subsequently onboard other people.
+    public fun init_dao(_sender: &signer) {
+
+    }
+
     // it takes one police member to reject a payment.
-    public fun reject_payment() {
+    public fun reject_payment(_sender: &signer, _uid: u64) {
 
     }
 
     // police can explicitly approve a payment faster
-    public fun expedite_payment() {
+    public fun expedite_payment(_sender: &signer, _uid: u64) {
 
     }
 
     // if you are on the list you can add another police member
-    public fun add_police() {
+    public fun add_police(_sender: &signer, _new_police: address) {
 
     }
 
     // if you are on the list you can remove another police member
-    public fun remove_police() {
+    public fun remove_police(_sender: &signer, _new_police: address) {
       
     }
 
     ////////// CALCS //////////
-    fun get_bond() {
+    fun get_bond(dao_addr: address) {
 
     }
 
-    fun get_delay() {
+    fun get_delay(dao_addr: address) {
 
     }
   }
