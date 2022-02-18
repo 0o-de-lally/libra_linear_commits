@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////
 // 0L Module
-// Self Service
-// Error code: 1905
+// Self Service Buffet
+// Error code: 
 /////////////////////////////////////////////////////////////////////////
 
 // TL;DR the guarantees that Self Service offers is: workers pay themselved. By default they will be paid, we assume honesty. Some attacks are possible, and that's explicitly ok. It's not profitable to try to amplify attacks because time delays and bonds kick in as there are more pending payments int he system.
@@ -50,6 +50,10 @@
 address 0x1 {
   module SelfService {
     use 0x1::GAS::GAS;
+    use 0x1::Vector;
+    use 0x1::Signer;
+    use 0x1::DiemConfig;
+    use 0x1::Diem;
 
     // gets initialized to a worker account when they submit a request for payment.
     struct Worker has key {
@@ -60,7 +64,8 @@ address 0x1 {
 
     // gets initialized to the DAO address on init_dao()
     struct Buffet has key {
-      balance: GAS,
+      balance: Diem::Diem<GAS>,
+      bond: Diem::Diem<GAS>, // Bond is here because it cannot be dropped
       funder_addr: vector<address>,
       funder_value: vector<u64>,
       police_list: vector<address>,
@@ -68,21 +73,27 @@ address 0x1 {
       max_uid: u64,
     }
 
-    struct Payment has key, store {
+    struct Payment has key, store, drop {
       uid: u64,
       worker: address,
       value: u64,
       epoch_requested: u64,
+      epoch_due: u64,
       deliverable: vector<u8>,
-      bond: GAS,
+      bond: u64, // NOTE: can't have the bond as the actual coin here, because this struct needs the 'drop' ability.
       rejection: vector<address>
     }
-
-
 
     ///////// WORKER FUNCTIONS ////////
 
     public fun pay_me(_sender: &signer, _from_dao: address, _amount: u64, _deliverable: vector<u8>, _bond: u64) {
+
+      maybe_init_worker(_sender);
+      // if it exists get the buffet object
+
+      // calculate the date it will receive.
+      // check if the bond is adequate.
+      // push the payment onto the list
 
     }
 
@@ -90,12 +101,18 @@ address 0x1 {
     // Anyone who wants to get paid can submit the release all. It will release all payments for everyone that is due.
     public fun release_all(_sender: &signer, _from_dao: address) {
 
+      // iterate through all the list of pending payments, and do maybe_make_payment
+
     }
 
     ////////// SPONSOR FUNCTIONS //////////
 
     // anyone can fund the pool. It doesn't give you any rights or governance.
-    public fun fund_it(_sender: &signer, _from_dao: address, amount: u64) {
+    public fun fund_it(_sender: &signer, _dao: address, _new_deposit: Diem::Diem<GAS>) acquires Buffet {
+      let b = borrow_global_mut<Buffet>(_dao);
+      Diem::deposit<GAS>(&mut b.balance, _new_deposit);
+
+      // TODO: add to funder table.
 
     }
 
@@ -105,36 +122,115 @@ address 0x1 {
     // all transactions in the future need to reference the DAO address
     // this also creates the first Police address, which can subsequently onboard other people.
     public fun init_dao(_sender: &signer) {
-
+      let new_buffet = Buffet {
+        balance: Diem::zero<GAS>(),
+        bond: Diem::zero<GAS>(),
+        funder_addr: Vector::empty<address>(),
+        funder_value: Vector::empty<u64>(),
+        police_list: Vector::empty<address>(),
+        pending_payments: Vector::empty<Payment>(),
+        max_uid: 0,
+      };
+      move_to<Buffet>(_sender, new_buffet)
     }
 
     // it takes one police member to reject a payment.
-    public fun reject_payment(_sender: &signer, _uid: u64) {
-
+    public fun reject_payment(_dao_addr: address, _sender: &signer, _uid: u64) acquires Buffet {
+      if (is_police(_dao_addr, Signer::address_of(_sender))) {
+        let (t, i) = get_index_by_uid(_dao_addr, _uid);
+        if (t) {
+          let b = borrow_global_mut<Buffet>(_dao_addr);
+          Vector::remove(&mut b.pending_payments, i);
+        }
+      };
     }
 
     // police can explicitly approve a payment faster
-    public fun expedite_payment(_sender: &signer, _uid: u64) {
-
+    public fun expedite_payment(_dao_addr: address, _sender: &signer, _uid: u64) acquires Buffet {
+      if (is_police(_dao_addr, Signer::address_of(_sender))) {
+        maybe_make_payment(_dao_addr, _uid);
+      };
     }
 
     // if you are on the list you can add another police member
-    public fun add_police(_sender: &signer, _new_police: address) {
+    public fun add_police(_dao_addr: address, _sender: &signer, _new_police: address) acquires Buffet{
+      if (is_police(_dao_addr, Signer::address_of(_sender))) {
+        let b = borrow_global_mut<Buffet>(_dao_addr);
+        Vector::push_back<address>(&mut b.police_list, _new_police);
+      }
 
     }
 
     // if you are on the list you can remove another police member
-    public fun remove_police(_sender: &signer, _new_police: address) {
-      
+    public fun remove_police(_dao_addr: address, _sender: &signer, _out_police: address) acquires Buffet {
+      if (is_police(_dao_addr, Signer::address_of(_sender))) {
+        let b = borrow_global_mut<Buffet>(_dao_addr);
+        let (t, i) = Vector::index_of<address>(&b.police_list, &_out_police);
+        if (t) {
+          Vector::remove<address>(&mut b.police_list, i);
+        }
+       
+      }
     }
 
     ////////// CALCS //////////
-    fun get_bond(dao_addr: address) {
+
+    fun get_bond_value(_dao_addr: address): u64 {
+      // TODO: decide on the curve
+      1
+    }
+
+    fun get_epochs_delay(_dao_addr: address): u64 {
+      // TODO: decide on the curve
+      2
+    }
+
+    ///////// PRIVATE FUNCTIONS ////////
+    fun maybe_make_payment(_dao_addr: address, _uid: u64) acquires Buffet {
+      let (t, i) = get_index_by_uid(_dao_addr, _uid);
+      if (!t) return; // TODO make this an assert with Error
+      let b = borrow_global_mut<Buffet>(_dao_addr);
+      let p = Vector::borrow<Payment>(&b.pending_payments, i);
+      if (p.epoch_due >= DiemConfig::get_current_epoch()) {
+        // TODO: Make payment
+        // p.value
+      };
+
+      // remove the element from vector if successful.
+      let _ = Vector::remove<Payment>(&mut b.pending_payments, i);
 
     }
 
-    fun get_delay(dao_addr: address) {
+    fun is_police(_dao_addr: address, _addr: address): bool acquires Buffet {
+      let b = borrow_global<Buffet>(_dao_addr);
+      Vector::contains<address>(&b.police_list, &_addr)
+    }
 
+    fun maybe_init_worker(_sender: &signer) {
+      if (!exists<Worker>(Signer::address_of(_sender))) {
+        move_to<Worker>(_sender, Worker {
+          pending_value: 0,
+          pending_bond: 0,
+          cumulative_payment: 0,
+        })
+      }
+    }
+
+    // removes an element from the list of payments, and returns in to scope.
+    // need to add it back to the list
+    fun get_index_by_uid(_dao_addr: address, _uid: u64): (bool, u64) acquires Buffet {
+      let b = borrow_global<Buffet>(_dao_addr);
+      let len = Vector::length<Payment>(&b.pending_payments);
+
+      let i = 0;
+      while (i < len) {
+        let p = Vector::borrow<Payment>(&b.pending_payments, i);
+
+        if (p.uid == _uid) return (true, i);
+
+        i = i + 1;
+      };
+      (false, 0)
     }
   }
 }
