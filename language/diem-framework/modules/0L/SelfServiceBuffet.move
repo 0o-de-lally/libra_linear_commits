@@ -4,51 +4,91 @@
 // Error code: 
 /////////////////////////////////////////////////////////////////////////
 
-// TL;DR the guarantee that Self Service Buffet offers is: workers pay themselves, and rampant abuse is minimized. But not all abuse. We assume honesty. By default Workers will be paid some days after a request is made, without intervention. Some attacks are possible, and that's explicitly ok, because 100% coverage is impossible. It's not profitable to try to amplify attacks because time delays and bonds kick in as there are more pending payments in the system.
+// TL;DR the guarantee that Self Service Buffet offers is: workers pay
+// themselves, and rampant abuse is minimized. But not all abuse. We assume
+// honesty. By default Workers will be paid some days after a request is made,
+// without intervention. Some attacks are possible, and that's explicitly ok,
+// because 100% coverage is impossible. It's not profitable to try to amplify
+// attacks because time delays and bonds kick in as there are more pending
+// payments in the system.
 
-// Games need to have an equilibrium. In any community the honest actors always pay for the actions of bad actors. There's monetary cost, and demotivation, and that can push the game out of balance. But fraud in games is not always obvious to identify, but equally important, it's not necessarily something that should be eliminated entirely. There's an adage in payment processing: "the only way to remove fraudulent transactions is to also remove the revenue".
+// Games need to have an equilibrium. In any community the honest actors always
+// pay for the actions of bad actors. There's monetary cost, and demotivation,
+// and that can push the game out of balance. But fraud in games is not always
+// obvious to identify, but equally important, it's not necessarily something
+// that should be eliminated entirely. There's an adage in payment processing:
+// "the only way to remove fraudulent transactions is to also remove the
+// revenue".
 
-// Self Service Buffet is a payment processing game for DAOs which optimizes for revenue, not for fraud prevention.
+// Self Service Buffet is a payment processing game for DAOs which optimizes for
+// revenue, not for fraud prevention.
 
-// DAO payments have mirrored the practices of companies: delivering work, send a report, then an invoice, getting invoice approved, and later finding the funds and authorizing transactions. This has a feeling of safety. It is process oriented, and appears more orderly. But it leaves money on the table for both the workers and for the protocols.
+// DAO payments have mirrored the practices of companies: delivering work, send
+// a report, then an invoice, getting invoice approved, and later finding the
+// funds and authorizing transactions. This has a feeling of safety. It is
+// process oriented, and appears more orderly. But it leaves money on the table
+// for both the workers and for the protocols.
 
-// The greatest cost in such a system is opportunity cost. How much work is the DAO failing to get done, because it is optimizing for minimal fraud? How much worse than free-mining proof-of-work can this be?
+// The greatest cost in such a system is opportunity cost. How much work is the
+// DAO failing to get done, because it is optimizing for minimal fraud? How much
+// worse than free-mining proof-of-work can this be?
 
-// Obviously, fraud can't be ignored.  But if we can limit the damage of the fraud, in material terms, and in psychological demotivation, while creating an automated process, we might have a net increase in economic value.
+// Obviously, fraud can't be ignored.  But if we can limit the damage of the
+// fraud, in material terms, and in psychological demotivation, while creating
+// an automated process, we might have a net increase in economic value.
 
 
-// The premise of Self Service Buffet is that fraud prevention for work is gated by the amount of people monitoring the scheme. The team monitoring the entire flow of payments before, can instead be a small committee, that monitors for fraud (and this committee can obviously be expanded or reduced algorithmically, but that's not a concern here)
+// The premise of Self Service Buffet is that fraud prevention for work is gated
+// by the amount of people monitoring the scheme. The team monitoring the entire
+// flow of payments before, can instead be a small committee, that monitors for
+// fraud (and this committee can obviously be expanded or reduced
+// algorithmically, but that's not a concern here)
 
 // Product requirements:
 
-// Least viable process. Every human in the loop slows down the payments. We need to make it rain on DAO contributors.
+// Least viable process. Every human in the loop slows down the payments. We
+// need to make it rain on DAO contributors.
 
-// Optimize for Net Payments. A few attacks is fine, if there is a net gain in productivity. But repeated attacks on scale should not be profitable.
+// Optimize for Net Payments. A few attacks is fine, if there is a net gain in
+// productivity. But repeated attacks on scale should not be profitable.
 
-// Distraction of the fraud monitoring team can be attacked, the policies should prevent monitors from getting overwhelmed.
+// Distraction of the fraud monitoring team can be attacked, the policies should
+// prevent monitors from getting overwhelmed.
 
-// Expensive griefing: if just for fun someone spams requests so to prevent good actors from getting paid, the cost should increase until it is prohibitive.
+// Expensive griefing: if just for fun someone spams requests so to prevent good
+// actors from getting paid, the cost should increase until it is prohibitive.
 
-// Don't rely on reputation. Reputation is high maintenance, and everyone monitoring reputation increases friction.
+// Don't rely on reputation. Reputation is high maintenance, and everyone
+// monitoring reputation increases friction.
 
 
 // Mechanism:
 
-// Each payment request has a Credit Limit, a maximum amount which can be disbursed. Note: credit limits are not per account, there is no reputation.
+// Each payment request has a Credit Limit, a maximum amount which can be
+// disbursed. Note: credit limits are not per account, there is no reputation.
 
-// Anyone can request multiple payments to circumvent Credit Limit. Thus requesting payments has a cost. The cost is time and a bond. 
+// Anyone can request multiple payments to circumvent Credit Limit. Thus
+// requesting payments has a cost. The cost is time and a bond. 
 
-// The costs increase as a function of two variables: 1) count of pending payments and 2) the value of pending payments.
+// The costs increase as a function of two variables: 1) count of pending
+// payments and 2) the value of pending payments.
 
-// The expected effect is that while there are few payments in the network of low value, the Police have easy work. When there are many requests, the police have more time to sift through the payments. 
+// The expected effect is that while there are few payments in the network of
+// low value, the Police have easy work. When there are many requests, the
+// police have more time to sift through the payments. 
 
-// Rejected payments forfeit the bond. The bond is forfeited and goes into the funding pool.
+// Rejected payments forfeit the bond. The bond is forfeited and goes into the
+// funding pool.
 
-// Griefing attacks (submitting spam requests to slow down payments for honest actors) will require increasing amounts of bonds.
+// Griefing attacks (submitting spam requests to slow down payments for honest
+// actors) will require increasing amounts of bonds.
 
-// And after a certain amount of pending payment (by value) reaches a threshold, a bond must also be placed, to prevent spam. In the ordinary course of events, with few payments below a value threshold, people get paid.
+// And after a certain amount of pending payment (by value) reaches a threshold,
+// a bond must also be placed, to prevent spam. In the ordinary course of
+// events, with few payments below a value threshold, people get paid.
 
-// Until there are 10 pending payments, the Delay is 3 epochs (days), and the Bond is 0.
+// Until there are 10 pending payments, the Delay is 3 epochs (days), and the
+// Bond is 0.
 
 
 
