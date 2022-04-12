@@ -11,7 +11,7 @@ use diem_types::{
     account_config::AccountResource,
     account_state::AccountState,
     account_state_blob::AccountStateBlob,
-    write_set::{WriteOp, WriteSetMut},
+    write_set::{WriteOp, WriteSetMut}
 };
 use move_core_types::move_resource::MoveResource;
 use ol_keys::wallet::get_account_from_mnem;
@@ -151,10 +151,9 @@ pub fn merge_writeset(left: WriteSetMut, right: WriteSetMut) -> Result<WriteSetM
 
 #[test]
 pub fn test_accounts_into_recovery() {
-    use diem_types::{account_config::BalanceResource, validator_config::ValidatorConfigResource};
+    use diem_types::{account_config::BalanceResource, validator_config::ValidatorConfigResource, ol_miner_state::TowerStateResource};
     use move_core_types::move_resource::MoveResource;
-    use ol_types::miner_state::TowerStateResource;
-
+ 
     use std::path::Path;
 
     let path = env!("CARGO_MANIFEST_DIR");
