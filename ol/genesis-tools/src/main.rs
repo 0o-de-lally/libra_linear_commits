@@ -53,7 +53,7 @@ async fn main() -> Result<()> {
                 
                 
             } else {
-                println!("ERROR: must provide a path with --snapshot, exiting.");
+                println!("ERROR: must provide a path with --snapshot-path, exiting.");
                 exit(1);
             }
         }

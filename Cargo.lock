@@ -5674,6 +5674,7 @@ dependencies = [
  "machine-ip",
  "move-binary-format",
  "move-core-types",
+ "move-vm-runtime",
  "move-vm-types",
  "nix 0.18.0",
  "num-format",

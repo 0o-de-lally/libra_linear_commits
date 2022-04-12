@@ -16,14 +16,21 @@ pub struct RestoreCmd {
     verbose: bool,
     #[options(short="e", help = "what epoch to start restore from")]
     epoch: Option<u64>,
+    #[options(short="r", help = "what epoch to start restore from")]
+    rescue: bool,
 }
 
 impl Runnable for RestoreCmd {
     /// Start the application.
     fn run(&self) {
+      if !self.rescue {
         match mgmt::restore::fast_forward_db(self.verbose, self.epoch) {
             Ok(_) => {},
             Err(e) => println!("ERROR: could not complete db restore, message: {:?}", e),
-        };
+        }; 
+      } else {
+        println!("rescuing db");
+      }
+
     }
 }

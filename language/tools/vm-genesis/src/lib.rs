@@ -195,6 +195,8 @@ pub fn encode_recovery_genesis_changeset(
     // vm_publishing_option: VMPublishingOption,
     chain: u8,
 ) -> Result<ChangeSet, Error> {
+    println!("Begin Recover Genesis Transactions");
+
     let mut stdlib_module_tuples: Vec<(ModuleId, &Vec<u8>)> = Vec::new();
     // create a data view for move_vm
     let mut state_view = GenesisStateView::new();
@@ -710,9 +712,11 @@ fn recovery_owners_operators(
     // key prefix and account address. Internally move then computes the auth key as auth key
     // prefix || address. Because of this, the initial auth key will be invalid as we produce the
     // account address from the name and not the public key.
-    // println!("0 ======== Create Owner Accounts");
+    println!("0 ======== Create Owner Accounts");
+    let mut count = 1;
+    let len = val_assignments.len();
     for i in val_assignments {
-        println!("account: {:?}", i.val_account);
+        println!("processing validator {}/{}, account: {:?}", count, len, i.val_account);
         // TODO: why does this need to be derived from human name?
         // let owner_address = staged_owner_auth_key.derived_address();
         let create_owner_script =
@@ -755,9 +759,11 @@ fn recovery_owners_operators(
                 MoveValue::Signer(i.val_account),
             ]),
         );
+
+        count += 1;
     }
 
-    // println!("1 ======== Create OP Accounts");
+    println!("1 ======== Create OP Accounts");
     // Create accounts for each validator operator
     for i in operator_registrations {
         let create_operator_script =
@@ -776,7 +782,7 @@ fn recovery_owners_operators(
         );
     }
 
-    // println!("2 ======== Link owner to OP");
+    println!("2 ======== Link owner to OP");
     // Authorize an operator for a validator/owner
     for i in val_assignments {
         let create_operator_script =
@@ -794,7 +800,7 @@ fn recovery_owners_operators(
         );
     }
 
-    // println!("3 ======== OP sends network info to Owner config");
+    println!("3 ======== OP sends network info to Owner config");
     // Set the validator operator configs for each owner
     for i in operator_registrations {
         let create_operator_script =

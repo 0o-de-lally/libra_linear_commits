@@ -67,6 +67,8 @@ move-binary-format = { path = "../../language/move-binary-format" }
 dialoguer = "0.8.0"
 diem-crypto = { path = "../../crypto/crypto" }
 
+move-vm-runtime = { path = "../../language/move-vm/runtime" }
+
 
 # Parity with Storage create
 [dependencies.rocksdb]
