@@ -25,7 +25,6 @@ use diem_types::{
     transaction::{SignedTransaction, Transaction},
 };
 use move_core_types::move_resource::{MoveResource, MoveStructType};
-use reqwest::Url;
 use serde::{de::DeserializeOwned, Serialize};
 use std::time::Duration;
 
@@ -174,8 +173,8 @@ impl BlockingClient {
     }
 
     /////// 0L /////////
-    pub fn url(&self) -> Url {
-        self.url.parse().unwrap()
+    pub fn url(&self) -> String {
+        self.url.clone()
     }
 
     pub fn get_transactions(

@@ -222,7 +222,7 @@ impl DiemClient {
 
     /// get url
     pub fn url(&self) -> Result<Url, Error> {
-        Ok(self.client.url())
+        Ok(self.client.url().parse()?)
     }
     //////// end 0L ////////
 
