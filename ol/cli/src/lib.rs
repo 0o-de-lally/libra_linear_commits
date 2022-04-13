@@ -19,4 +19,4 @@ pub mod mgmt;
 pub mod cache;
 pub mod check;
 pub mod server;
-pub mod rescue;
+// pub mod rescue;

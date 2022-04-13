@@ -763,9 +763,14 @@ fn recovery_owners_operators(
         count += 1;
     }
 
-    println!("1 ======== Create OP Accounts");
     // Create accounts for each validator operator
+    println!("1 ======== Create OP Accounts");
+    
+    let mut count = 1;
+    let len = operator_registrations.len();
     for i in operator_registrations {
+       println!("processing validator {}/{}, account: {:?}", count, len, i.operator_account);
+
         let create_operator_script =
             transaction_builder::encode_create_validator_operator_account_script_function(
                 0,
@@ -780,24 +785,24 @@ fn recovery_owners_operators(
             diem_root_address,
             &create_operator_script,
         );
+        count += 1;
+
     }
 
     println!("2 ======== Link owner to OP");
-    // Authorize an operator for a validator/owner
+    // // Authorize an operator for a validator/owner
     for i in val_assignments {
-        let create_operator_script =
-            transaction_builder::encode_set_validator_operator_with_nonce_admin_script_function(
-                0,
-                i.operator_delegated_account.to_vec(),
-                i.operator_delegated_account,
-            )
-            .into_script_function();
-        exec_script_function(
-            session,
-            log_context,
-            i.val_account, //TODO: check the signer is correct
-            &create_operator_script,
-        );
+      exec_function(
+        session,
+        log_context,
+        "ValidatorConfig",
+        "set_operator",
+        vec![],
+        serialize_values(&vec![
+              MoveValue::Signer(i.val_account),
+              MoveValue::Address(i.operator_delegated_account),
+          ]),
+    );
     }
 
     println!("3 ======== OP sends network info to Owner config");
@@ -819,7 +824,7 @@ fn recovery_owners_operators(
         );
     }
 
-    // println!("4 ======== Add owner to validator set");
+    println!("4 ======== Add owner to validator set");
     // Add each validator to the validator set
     for i in val_set {
         // let staged_owner_auth_key = AuthenticationKey::ed25519(owner_key.as_ref().unwrap());
