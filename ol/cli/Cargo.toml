@@ -68,6 +68,8 @@ dialoguer = "0.8.0"
 diem-crypto = { path = "../../crypto/crypto" }
 
 move-vm-runtime = { path = "../../language/move-vm/runtime" }
+move-cli = { path = "../../language/tools/move-cli" }
+diem-vm = { path = "../../language/diem-vm" }
 
 
 # Parity with Storage create
