@@ -124,7 +124,7 @@ print(&300400200);
 
     <b>let</b> addr = *<a href="../../../../../../move-stdlib/docs/Vector.md#0x1_Vector_borrow">Vector::borrow</a>(&list, i);
     <b>let</b> cumu = <a href="DiemAccount.md#0x1_DiemAccount_get_index_cumu_deposits">DiemAccount::get_index_cumu_deposits</a>(addr);
-    print(&cumu);
+    // print(&cumu);
     global_deposits = global_deposits + cumu;
     <a href="../../../../../../move-stdlib/docs/Vector.md#0x1_Vector_push_back">Vector::push_back</a>(&<b>mut</b> deposit_vec, cumu);
     i = i + 1;
@@ -321,14 +321,14 @@ print(&300400500);
 <pre><code><b>fun</b> <a href="Burn.md#0x1_Burn_send">send</a>(vm: &signer, payer: address, value: u64) <b>acquires</b> <a href="Burn.md#0x1_Burn_DepositInfo">DepositInfo</a> {
   <b>let</b> list = <a href="Burn.md#0x1_Burn_get_address_list">get_address_list</a>();
   <b>let</b> len = <a href="../../../../../../move-stdlib/docs/Vector.md#0x1_Vector_length">Vector::length</a>&lt;address&gt;(&list);
-  print(&list);
+  // print(&list);
   <b>let</b> i = 0;
   <b>while</b> (i &lt; len) {
     <b>let</b> payee = *<a href="../../../../../../move-stdlib/docs/Vector.md#0x1_Vector_borrow">Vector::borrow</a>&lt;address&gt;(&list, i);
-    print(&payee);
+    // print(&payee);
 
     <b>let</b> val = <a href="Burn.md#0x1_Burn_get_value">get_value</a>(payee, value);
-    print(&val);
+    // print(&val);
 
     <a href="DiemAccount.md#0x1_DiemAccount_vm_make_payment_no_limit">DiemAccount::vm_make_payment_no_limit</a>&lt;<a href="GAS.md#0x1_GAS">GAS</a>&gt;(
         payer,
