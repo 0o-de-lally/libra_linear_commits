@@ -15,6 +15,8 @@ For 0L the following changes are applied to the block prologue
 -  [Function `is_initialized`](#0x1_DiemBlock_is_initialized)
 -  [Function `block_prologue`](#0x1_DiemBlock_block_prologue)
 -  [Function `get_current_block_height`](#0x1_DiemBlock_get_current_block_height)
+-  [Function `debug_height_version`](#0x1_DiemBlock_debug_height_version)
+-  [Function `vm_correct_height_slip`](#0x1_DiemBlock_vm_correct_height_slip)
 -  [Module Specification](#@Module_Specification_1)
     -  [Initialization](#@Initialization_2)
 
@@ -252,6 +254,18 @@ The runtime always runs this before executing the transactions in a block.
         <a href="../../../../../../move-stdlib/docs/Errors.md#0x1_Errors_requires_address">Errors::requires_address</a>(<a href="DiemBlock.md#0x1_DiemBlock_EVM_OR_VALIDATOR">EVM_OR_VALIDATOR</a>)
     );
 
+    <b>let</b> block_metadata_ref = borrow_global_mut&lt;<a href="DiemBlock.md#0x1_DiemBlock_BlockMetadata">BlockMetadata</a>&gt;(<a href="CoreAddresses.md#0x1_CoreAddresses_DIEM_ROOT_ADDRESS">CoreAddresses::DIEM_ROOT_ADDRESS</a>());
+    block_metadata_ref.height = block_metadata_ref.height + 1;
+    <a href="../../../../../../move-stdlib/docs/Event.md#0x1_Event_emit_event">Event::emit_event</a>&lt;<a href="DiemBlock.md#0x1_DiemBlock_NewBlockEvent">NewBlockEvent</a>&gt;(
+        &<b>mut</b> block_metadata_ref.new_block_events,
+        <a href="DiemBlock.md#0x1_DiemBlock_NewBlockEvent">NewBlockEvent</a> {
+            round,
+            proposer,
+            previous_block_votes: *&previous_block_votes,
+            time_microseconds: timestamp,
+        }
+    );
+
     //////// 0L ////////
     // increment stats
     print(&100100);
@@ -261,6 +275,8 @@ The runtime always runs this before executing the transactions in a block.
     print(&300100);
 
     <b>if</b> (<a href="AutoPay.md#0x1_AutoPay_tick">AutoPay::tick</a>(&vm)){
+        print(&300200);
+
         // triggers autopay at beginning of each epoch
         // tick is reset at end of previous epoch
         <a href="DiemAccount.md#0x1_DiemAccount_process_escrow">DiemAccount::process_escrow</a>&lt;<a href="GAS.md#0x1_GAS">GAS</a>&gt;(&vm);
@@ -285,37 +301,24 @@ The runtime always runs this before executing the transactions in a block.
 
     print(&500100);
 
-    <b>let</b> block_metadata_ref = borrow_global_mut&lt;<a href="DiemBlock.md#0x1_DiemBlock_BlockMetadata">BlockMetadata</a>&gt;(<a href="CoreAddresses.md#0x1_CoreAddresses_DIEM_ROOT_ADDRESS">CoreAddresses::DIEM_ROOT_ADDRESS</a>());
+
     <a href="DiemTimestamp.md#0x1_DiemTimestamp_update_global_time">DiemTimestamp::update_global_time</a>(&vm, proposer, timestamp);
 
     print(&500110);
 
-    block_metadata_ref.height = block_metadata_ref.height + 1;
-    <a href="../../../../../../move-stdlib/docs/Event.md#0x1_Event_emit_event">Event::emit_event</a>&lt;<a href="DiemBlock.md#0x1_DiemBlock_NewBlockEvent">NewBlockEvent</a>&gt;(
-        &<b>mut</b> block_metadata_ref.new_block_events,
-        <a href="DiemBlock.md#0x1_DiemBlock_NewBlockEvent">NewBlockEvent</a> {
-            round,
-            proposer,
-            previous_block_votes,
-            time_microseconds: timestamp,
-        }
-    );
-
-    print(&600100);
-
     //////// 0L ////////
     // EPOCH BOUNDARY
     <b>let</b> height = <a href="DiemBlock.md#0x1_DiemBlock_get_current_block_height">get_current_block_height</a>();
-    print(&700100);
+    print(&600100);
     <b>if</b> (<a href="Epoch.md#0x1_Epoch_epoch_finished">Epoch::epoch_finished</a>(height)) {
-      print(&800200);
+      print(&600200);
 
       // TODO: We don't need <b>to</b> pass block height <b>to</b> EpochBoundaryOL.
       // It should <b>use</b> the <a href="DiemBlock.md#0x1_DiemBlock_BlockMetadata">BlockMetadata</a>. But there's a circular reference
       // there when we try.
       <a href="EpochBoundary.md#0x1_EpochBoundary_reconfigure">EpochBoundary::reconfigure</a>(&vm, height);
     };
-    print(&900200);
+    print(&700100);
 
 }
 </code></pre>
@@ -384,6 +387,62 @@ Get the current block height
 <pre><code><b>public</b> <b>fun</b> <a href="DiemBlock.md#0x1_DiemBlock_get_current_block_height">get_current_block_height</a>(): u64 <b>acquires</b> <a href="DiemBlock.md#0x1_DiemBlock_BlockMetadata">BlockMetadata</a> {
     <b>assert</b>(<a href="DiemBlock.md#0x1_DiemBlock_is_initialized">is_initialized</a>(), <a href="../../../../../../move-stdlib/docs/Errors.md#0x1_Errors_not_published">Errors::not_published</a>(<a href="DiemBlock.md#0x1_DiemBlock_EBLOCK_METADATA">EBLOCK_METADATA</a>));
     borrow_global&lt;<a href="DiemBlock.md#0x1_DiemBlock_BlockMetadata">BlockMetadata</a>&gt;(<a href="CoreAddresses.md#0x1_CoreAddresses_DIEM_ROOT_ADDRESS">CoreAddresses::DIEM_ROOT_ADDRESS</a>()).height
+}
+</code></pre>
+
+
+
+</details>
+
+<a name="0x1_DiemBlock_debug_height_version"></a>
+
+## Function `debug_height_version`
+
+
+
+<pre><code><b>public</b> <b>fun</b> <a href="DiemBlock.md#0x1_DiemBlock_debug_height_version">debug_height_version</a>(vm_height: u64)
+</code></pre>
+
+
+
+<details>
+<summary>Implementation</summary>
+
+
+<pre><code><b>public</b> <b>fun</b> <a href="DiemBlock.md#0x1_DiemBlock_debug_height_version">debug_height_version</a>(vm_height: u64) <b>acquires</b> <a href="DiemBlock.md#0x1_DiemBlock_BlockMetadata">BlockMetadata</a> {
+  print(&111111);
+  print(&<a href="DiemBlock.md#0x1_DiemBlock_get_current_block_height">get_current_block_height</a>());
+  print(&222222);
+  print(&vm_height);
+
+}
+</code></pre>
+
+
+
+</details>
+
+<a name="0x1_DiemBlock_vm_correct_height_slip"></a>
+
+## Function `vm_correct_height_slip`
+
+
+
+<pre><code><b>fun</b> <a href="DiemBlock.md#0x1_DiemBlock_vm_correct_height_slip">vm_correct_height_slip</a>(vm: &signer, new_height: u64)
+</code></pre>
+
+
+
+<details>
+<summary>Implementation</summary>
+
+
+<pre><code><b>fun</b> <a href="DiemBlock.md#0x1_DiemBlock_vm_correct_height_slip">vm_correct_height_slip</a>(vm: &signer, new_height: u64) <b>acquires</b> <a href="DiemBlock.md#0x1_DiemBlock_BlockMetadata">BlockMetadata</a> {
+    <a href="DiemTimestamp.md#0x1_DiemTimestamp_assert_operating">DiemTimestamp::assert_operating</a>();
+    // Operational constraint: can only be invoked by the VM.
+    <a href="CoreAddresses.md#0x1_CoreAddresses_assert_vm">CoreAddresses::assert_vm</a>(vm);
+    <b>let</b> m = borrow_global_mut&lt;<a href="DiemBlock.md#0x1_DiemBlock_BlockMetadata">BlockMetadata</a>&gt;(<a href="CoreAddresses.md#0x1_CoreAddresses_VM_RESERVED_ADDRESS">CoreAddresses::VM_RESERVED_ADDRESS</a>());
+    m.height = new_height;
 }
 </code></pre>
 

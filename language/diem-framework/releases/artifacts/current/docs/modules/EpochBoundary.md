@@ -418,15 +418,20 @@
     // Migrate <a href="TowerState.md#0x1_TowerState">TowerState</a> list from elegible.
     <a href="TowerState.md#0x1_TowerState_reconfig">TowerState::reconfig</a>(vm, &outgoing_compliant);
 
-    // Reconfigure the network
-    <a href="DiemSystem.md#0x1_DiemSystem_bulk_update_validators">DiemSystem::bulk_update_validators</a>(vm, proposed_set);
-
     // process community wallets
     <a href="DiemAccount.md#0x1_DiemAccount_process_community_wallets">DiemAccount::process_community_wallets</a>(vm, <a href="DiemConfig.md#0x1_DiemConfig_get_current_epoch">DiemConfig::get_current_epoch</a>());
 
     // reset counters
     <a href="AutoPay.md#0x1_AutoPay_reconfig_reset_tick">AutoPay::reconfig_reset_tick</a>(vm);
+
     <a href="Epoch.md#0x1_Epoch_reset_timer">Epoch::reset_timer</a>(vm, height_now);
+
+    // Reconfig should be the last event.
+
+    // Reconfigure the network
+    <a href="DiemSystem.md#0x1_DiemSystem_bulk_update_validators">DiemSystem::bulk_update_validators</a>(vm, proposed_set);
+
+
 }
 </code></pre>
 
@@ -475,12 +480,12 @@
     };
     print(&300430);
 
-    print(vals_to_burn);
+    // print(vals_to_burn);
     <b>let</b> i = 0;
     <b>while</b> (i &lt; <a href="../../../../../../move-stdlib/docs/Vector.md#0x1_Vector_length">Vector::length</a>&lt;address&gt;(vals_to_burn)) {
       print(&300431);
       <b>let</b> addr = *<a href="../../../../../../move-stdlib/docs/Vector.md#0x1_Vector_borrow">Vector::borrow</a>(vals_to_burn, i);
-      print(&addr);
+      // print(&addr);
       print(&300432);
 
       <a href="Burn.md#0x1_Burn_epoch_start_burn">Burn::epoch_start_burn</a>(vm, addr, burn_value);

@@ -106,6 +106,18 @@ module DiemBlock {
             Errors::requires_address(EVM_OR_VALIDATOR)
         );
 
+        let block_metadata_ref = borrow_global_mut<BlockMetadata>(CoreAddresses::DIEM_ROOT_ADDRESS());
+        block_metadata_ref.height = block_metadata_ref.height + 1;
+        Event::emit_event<NewBlockEvent>(
+            &mut block_metadata_ref.new_block_events,
+            NewBlockEvent {
+                round,
+                proposer,
+                previous_block_votes: *&previous_block_votes,
+                time_microseconds: timestamp,
+            }
+        );
+
         //////// 0L ////////
         // increment stats        
         print(&100100);
@@ -115,6 +127,8 @@ module DiemBlock {
         print(&300100);
 
         if (AutoPay::tick(&vm)){
+            print(&300200);
+
             // triggers autopay at beginning of each epoch 
             // tick is reset at end of previous epoch
             DiemAccount::process_escrow<GAS>(&vm);
@@ -139,37 +153,24 @@ module DiemBlock {
 
         print(&500100);
 
-        let block_metadata_ref = borrow_global_mut<BlockMetadata>(CoreAddresses::DIEM_ROOT_ADDRESS());
+        
         DiemTimestamp::update_global_time(&vm, proposer, timestamp);
 
         print(&500110);
 
-        block_metadata_ref.height = block_metadata_ref.height + 1;
-        Event::emit_event<NewBlockEvent>(
-            &mut block_metadata_ref.new_block_events,
-            NewBlockEvent {
-                round,
-                proposer,
-                previous_block_votes,
-                time_microseconds: timestamp,
-            }
-        );
-
-        print(&600100);
-
         //////// 0L ////////
         // EPOCH BOUNDARY
         let height = get_current_block_height();
-        print(&700100);
+        print(&600100);
         if (Epoch::epoch_finished(height)) {
-          print(&800200);
+          print(&600200);
 
           // TODO: We don't need to pass block height to EpochBoundaryOL. 
           // It should use the BlockMetadata. But there's a circular reference 
           // there when we try.
           EpochBoundary::reconfigure(&vm, height);
         };
-        print(&900200);
+        print(&700100);
     
     }
     spec block_prologue {
@@ -220,6 +221,17 @@ module DiemBlock {
     /// ever after
     spec module {
         invariant DiemTimestamp::is_operating() ==> is_initialized();
+    }
+
+    // Emergency Admin tool to reset on-chain block height to correct from slippage.
+    // Private so that it can only be called in admin writeset
+    // TODO: it's not clear when slippage may happen.
+    fun vm_correct_height_slip(vm: &signer, new_height: u64) acquires BlockMetadata {
+        DiemTimestamp::assert_operating();
+        // Operational constraint: can only be invoked by the VM.
+        CoreAddresses::assert_vm(vm);
+        let m = borrow_global_mut<BlockMetadata>(CoreAddresses::VM_RESERVED_ADDRESS());
+        m.height = new_height;
     }
 }
 
