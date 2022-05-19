@@ -266,7 +266,7 @@ fn test_no_quorum_on_upgrade_tx() {
   let txn = oracle_helper_tx(&accounts.get(0).unwrap(), 3);
 
   // Force the test runner to create a new block before running the test.
-  executor.new_custom_block(2);
+  executor.new_custom_block(1);
   
   // Execute and persist the transaction
   let output = executor.execute_and_apply(txn);
@@ -287,8 +287,11 @@ fn test_successful_upgrade_txs() {
   // create an association account and validator accounts
   let diem_root = Account::new_diem_root();
   let accounts = set_up_validators(&mut executor, diem_root);
+  dbg!("1");
 
-  executor.new_custom_block(2);
+  executor.new_custom_block(1);
+  
+  dbg!("2");
 
   // Construct a valid and signed tx script.
   let txn_0 = oracle_helper_tx(&accounts.get(0).unwrap(), 3);
@@ -297,6 +300,7 @@ fn test_successful_upgrade_txs() {
     output.status().status(),
     Ok(KeptVMStatus::Executed)
   );
+  dbg!("4");
 
   executor.new_custom_block(2);
   let txn_1 = oracle_helper_tx(&accounts.get(1).unwrap(), 3);
@@ -305,10 +309,13 @@ fn test_successful_upgrade_txs() {
     output.status().status(),
     Ok(KeptVMStatus::Executed)
   );
+  dbg!("5");
 
-  executor.new_custom_block(2);
+  executor.new_custom_block(3);
   let txn_2 = oracle_helper_tx(&accounts.get(2).unwrap(), 3);
   let output = executor.execute_and_apply(txn_2);
+  dbg!("6");
+
   assert_eq!(
     output.status().status(),
     Ok(KeptVMStatus::Executed)
@@ -317,14 +324,20 @@ fn test_successful_upgrade_txs() {
 
   // verify that the foo transaction should fail w/o the updated stdlib
   test_foo(&accounts.get(3).unwrap(), &mut executor, false);
+  dbg!("7");
 
   // The creation of these blocks update the stdlib
+  executor.new_custom_block(1);
+  dbg!("8");
   executor.new_custom_block(2);
-  executor.new_custom_block(2);
+  dbg!("9");
 
   // verify that the foo transaction should pass with the updated stdlib
   test_foo(&accounts.get(4).unwrap(), &mut executor, true);
+  dbg!("10");
 
   // Checks update doesn't happen again
-  executor.new_custom_block(2);
+  executor.new_custom_block(3);
+  dbg!("11");
+
 }
