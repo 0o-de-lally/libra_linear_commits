@@ -4,7 +4,6 @@
 ///////////////////////////////////////////////////////////////////////////
 address 0x1 {
 module Upgrade {
-    use DiemFramework::CoreAddresses;
     use Std::Errors;
     use Std::Signer;
     use Std::Vector;
@@ -95,9 +94,9 @@ module Upgrade {
 
     //////// FOR E2E Testing ////////
     // Do not delete these lines. Uncomment when needed to generate e2e test fixtures. 
-    use 0x1::Debug::print;
-    public fun foo() {
-        print(&0x050D1AC);
+     use 0x1::Debug::print;
+     public fun foo() {
+         print(&0x050D1AC);
     }
 
     //////// FOR E2E Testing ////////
