@@ -303,10 +303,10 @@ impl EpochManager {
         let mut safety_rules =
             MetricsSafetyRules::new(self.safety_rules_manager.client(), self.storage.clone());
         if let Err(error) = safety_rules.perform_initialize() {
-            error!(
-                epoch = epoch,
-                error = error,
-                "Unable to initialize safety rules.",
+          //////// 0L ////////
+          // if safety rules cannot be initialized then the validator will not be able to vote. So this should be a panic.
+            panic!(
+                "Unable to initialize safety rules. Your validator will not be able to vote. Initializing epoch: {}, {:?}", epoch, error
             );
         }
 
