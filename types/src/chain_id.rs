@@ -77,8 +77,10 @@ impl FromStr for NamedChain { //////// 0L ////////
 }
 /// Note: u7 in a u8 is uleb-compatible, and any usage of this should be aware
 /// that this field maybe updated to be uleb64 in the future
-#[derive(Clone, Copy, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[derive(Clone, Copy, Eq, Hash, PartialEq, Serialize)]
 pub struct ChainId(u8);
+
+struct ChainIdVisitor;
 
 pub fn deserialize_config_chain_id<'de, D>(
     deserializer: D,
@@ -86,8 +88,7 @@ pub fn deserialize_config_chain_id<'de, D>(
 where
     D: Deserializer<'de>,
 {
-    struct ChainIdVisitor;
-
+    
     impl<'de> Visitor<'de> for ChainIdVisitor {
         type Value = ChainId;
 
@@ -99,6 +100,7 @@ where
         where
             E: serde::de::Error,
         {
+            dbg!("trying to deserialize str");
             ChainId::from_str(value).map_err(serde::de::Error::custom)
         }
 
@@ -106,6 +108,8 @@ where
         where
             E: serde::de::Error,
         {
+            dbg!("trying to deserialize u64");
+
             Ok(ChainId::new(
                 u8::try_from(value).map_err(serde::de::Error::custom)?,
             ))
@@ -114,6 +118,16 @@ where
 
     deserializer.deserialize_any(ChainIdVisitor)
 }
+
+impl<'de> Deserialize<'de> for ChainId {
+    fn deserialize<D>(deserializer: D) -> Result<ChainId, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        deserializer.deserialize_u64(ChainIdVisitor)
+    }
+}
+
 
 impl fmt::Debug for ChainId {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
