@@ -6,7 +6,7 @@ use super::genesis_files_cmd;
 use crate::prelude::app_config;
 use abscissa_core::{status_info, status_ok, Command, Options, Runnable};
 use diem_genesis_tool::ol_node_files;
-use diem_types::chain_id::NamedChain;
+use diem_types::chain_id::{ChainId, NamedChain};
 use diem_types::{transaction::SignedTransaction, waypoint::Waypoint};
 use diem_wallet::WalletLibrary;
 use ol::{commands::init_cmd, config::AppCfg};
@@ -33,7 +33,7 @@ pub struct ValWizardCmd {
     #[options(help = "explicitly set home path instead of answer in wizard, for CI usually")]
     home_path: Option<PathBuf>,
     #[options(help = "id of the chain")]
-    chain_id: Option<NamedChain>,
+    chain_id: Option<ChainId>,
     #[options(help = "github org of genesis repo")]
     github_org: Option<String>,
     #[options(help = "repo with with genesis transactions")]
@@ -358,7 +358,7 @@ fn get_genesis_and_make_node_files(cmd: &ValWizardCmd, home_path: &PathBuf, _bas
   // TODO: use node_config to get the seed peers and then write upstream_node vec in 0L.toml from that.
   match ol_node_files::onboard_helper_all_files(
       home_dir.clone(),
-      cmd.chain_id.unwrap_or(NamedChain::MAINNET),
+      cmd.chain_id.unwrap_or(NamedChain::MAINNET.to_chain_id()),
       cmd.github_org.clone(),
       cmd.repo.clone(),
       &namespace,

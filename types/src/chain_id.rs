@@ -47,8 +47,8 @@ impl NamedChain {
     }
 
 
-    pub fn str_to_chain_id(s: &str) -> Result<ChainId> { //////// 0L ////////
-        Ok(ChainId::new(Self::str_to_named(s)?.id()))
+    pub fn to_chain_id(&self) -> ChainId { //////// 0L ////////
+        ChainId::new(self.id())
     }
 
     pub fn id(&self) -> u8 {
@@ -160,11 +160,14 @@ impl FromStr for ChainId {
     
     fn from_str(s: &str) -> Result<Self> {
         ensure!(!s.is_empty(), "Cannot create chain ID from empty string");
-        NamedChain::str_to_chain_id(s).or_else(|_err| {
-            let value = s.parse::<u8>()?;
-            ensure!(value > 0, "cannot have chain ID with 0");
-            Ok(ChainId::new(value))
-        })
+        match NamedChain::from_str(s) { //////// 0L ////////
+            Ok(n) => Ok(n.to_chain_id()),
+            Err(_) => {
+              let value = s.parse::<u8>()?;
+              ensure!(value > 0, "cannot have chain ID with 0");
+              Ok(ChainId::new(value))
+            },
+        }
     }
 }
 

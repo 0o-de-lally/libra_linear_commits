@@ -5,7 +5,7 @@ use diem_config::config::NodeConfig;
 use diem_global_constants::{CONFIG_FILE, NODE_HOME};
 use diem_types::{
     account_address::AccountAddress, transaction::authenticator::AuthenticationKey,
-    waypoint::Waypoint, chain_id::NamedChain,
+    waypoint::Waypoint, chain_id::{NamedChain, ChainId},
 };
 use dirs;
 use once_cell::sync::Lazy;
@@ -149,7 +149,7 @@ impl AppCfg {
         source_path: &Option<PathBuf>,
         statement: Option<String>,
         ip: Option<Ipv4Addr>,
-        network_id: &Option<NamedChain>,
+        network_id: &Option<ChainId>,
     ) -> Result<AppCfg, Error> {
         // TODO: Check if configs exist and warn on overwrite.
         let mut default_config = AppCfg::default();
@@ -357,7 +357,7 @@ impl Default for Workspace {
 // #[serde(deny_unknown_fields)]
 pub struct ChainInfo {
     /// Chain that this work is being committed to
-    pub chain_id: NamedChain,
+    pub chain_id: ChainId,
 
     /// Epoch from which the node started syncing
     pub base_epoch: Option<u64>,
@@ -370,7 +370,7 @@ pub struct ChainInfo {
 impl Default for ChainInfo {
     fn default() -> Self {
         Self {
-            chain_id: NamedChain::MAINNET,
+            chain_id: NamedChain::MAINNET.to_chain_id(),
             base_epoch: Some(0),
             // Mock Waypoint. Miner complains without.
             base_waypoint: Waypoint::from_str(BASE_WAYPOINT).ok(),

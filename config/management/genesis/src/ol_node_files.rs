@@ -18,7 +18,7 @@ use diem_global_constants::{
 };
 use diem_management::{config::ConfigPath, error::Error, secure_backend::ValidatorBackend};
 use diem_secure_storage::{CryptoStorage, KVStorage};
-use diem_types::{account_address::AccountAddress, chain_id::{ChainId, NamedChain}, waypoint::Waypoint};
+use diem_types::{account_address::AccountAddress, chain_id::ChainId, waypoint::Waypoint};
 use ol_types::account::ValConfigs;
 use serde::{Deserialize, Serialize};
 use structopt::StructOpt;
@@ -45,7 +45,7 @@ pub struct Files {
     #[structopt(long)]
     repo: Option<String>,
     #[structopt(long)]
-    chain_id: NamedChain,
+    chain_id: ChainId,
     /// If specified, compares the internal state to that of a
     /// provided genesis. Note, that a waypont might diverge from
     /// the provided genesis after execution has begun.
@@ -90,7 +90,7 @@ impl Files {
 
 pub fn onboard_helper_all_files(
     output_dir: PathBuf,
-    chain_name: NamedChain,
+    chain_name: ChainId,
     github_org: Option<String>,
     repo: Option<String>,
     namespace: &str,

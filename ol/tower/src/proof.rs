@@ -425,7 +425,7 @@ pub fn test_make_configs_fixture() -> AppCfg {
     let mut cfg = AppCfg::default();
     cfg.workspace.node_home = PathBuf::from(".");
     cfg.workspace.block_dir = "test_blocks_temp_1".to_owned();
-    cfg.chain_info.chain_id = NamedChain::DEVNET;
+    cfg.chain_info.chain_id = NamedChain::DEVNET.to_chain_id();
     cfg.profile.auth_key = "3e4629ba1e63114b59a161e89ad4a083b3a31b5fd59e39757c493e96398e4df2"
         .parse()
         .unwrap();

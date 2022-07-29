@@ -16,7 +16,7 @@ use diem_genesis_tool::{
     seeds::{SeedAddresses, Seeds},
 };
 use diem_json_rpc_client::AccountAddress;
-use diem_types::{transaction::authenticator::AuthenticationKey, chain_id::NamedChain};
+use diem_types::{transaction::authenticator::AuthenticationKey, chain_id:: ChainId};
 use diem_types::waypoint::Waypoint;
 use diem_wallet::WalletLibrary;
 use fs_extra::file::{copy, CopyOptions};
@@ -34,7 +34,7 @@ pub struct InitCmd {
 
     /// named id of the chain
     #[options(help = "id of the chain")]
-    chain_id: Option<NamedChain>,
+    chain_id: Option<ChainId>,
     /// For "app" option an upstream peer to use in 0L.toml
     #[options(help = "An upstream peer to use in 0L.toml")]
     rpc_peer: Option<Url>,
@@ -321,7 +321,7 @@ pub fn initialize_app_cfg(
     epoch_opt: &Option<u64>,
     wp_opt: &Option<Waypoint>,
     source_path: &Option<PathBuf>,
-    network_id: &Option<NamedChain>,
+    network_id: &Option<ChainId>,
 ) -> Result<AppCfg, Error> {
     let cfg = AppCfg::init_app_configs(
         authkey,
