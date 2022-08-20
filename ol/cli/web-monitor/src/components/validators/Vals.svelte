@@ -1,8 +1,13 @@
 <script lang="ts">
+import { get } from 'svelte/store';
+import { valsInitView } from '../../store';
+
   import AddressNoteTip from '../address/AddressNoteTip.svelte';
   import Network from './Network.svelte';
   import ValidatorModal from "./ValidatorModal.svelte";
   export let data;
+
+  let val_view = get(valsInitView);
 
   const modal_id = "vals-tab-val-modal";
   let view = "Chain";
@@ -40,6 +45,12 @@
   let has_notes = false;
   $: if (data.chain_view && data.chain_view.validator_view) {
     set = data.chain_view.validator_view;
+    // if the initial view is not set
+    if (val_view.length == 0) {
+      valsInitView.set(data.chain_view.validator_view)
+    }
+    
+    
     has_notes = set.some(e => e.note != "");
     if (selectedVal == null) {
       // initial selection
@@ -109,6 +120,9 @@
               <td class="uk-text-right">{val.count_proofs_in_epoch}</td>
               <td class="uk-text-right">{val.tower_height}</td>
               <td class="uk-text-right">{val.vote_count_in_epoch}</td>
+              <td class="uk-text-right">{val.vote_count_in_epoch - val_view[i].vote_count_in_epoch || 0 }</td>
+
+              
               <td class="uk-text-right">{val.prop_count_in_epoch}</td>
               <td class="uk-text-right">{val.burn_to_community}</td>
               <td>
