@@ -36,7 +36,7 @@ mod state_sync_v2;
 mod storage;
 
 #[cfg(test)]
-mod smoke_test_environment;
+pub mod smoke_test_environment;
 
 #[cfg(test)]
 mod test_utils;

@@ -6620,6 +6620,14 @@ dependencies = [
 [[package]]
 name = "ol_swarm"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "diem-types",
+ "forge",
+ "rand 0.8.4",
+ "smoke-test",
+ "tokio 1.18.2",
+]
 
 [[package]]
 name = "onboard"
