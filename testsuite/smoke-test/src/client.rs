@@ -19,6 +19,17 @@ use diem_secure_storage::KVStorage;
 
 //////// 0L ////////
 #[tokio::test]
+async fn ol_experimental() {
+    let (mut swarm, _op_tool, _backend, storage) = launch_swarm_with_op_tool_and_backend(1).await;
+    let owner_account = storage.get::<AccountAddress>(OWNER_ACCOUNT).unwrap().value;
+    let keys = storage.export_private_key(OWNER_KEY).unwrap();
+    let mut local_acct = LocalAccount::new(owner_account, keys, 0);
+
+    swarm.chain_info().ol_send_demo_tx(&mut local_acct).await.unwrap();
+}
+
+//////// 0L ////////
+#[tokio::test]
 async fn ol_test_demo() {
     let (mut swarm, _op_tool, _backend, storage) = launch_swarm_with_op_tool_and_backend(1).await;
     let owner_account = storage.get::<AccountAddress>(OWNER_ACCOUNT).unwrap().value;
