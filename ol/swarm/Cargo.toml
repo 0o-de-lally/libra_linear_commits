@@ -12,3 +12,6 @@ rand = "0.8.3"
 anyhow = "1.0.52"
 tokio = { version = "1.8.1", features = ["full"] }
 diem-types = { path = "../../types"}
+
+vm-genesis = { path = "../../diem-move/vm-genesis"}
+
