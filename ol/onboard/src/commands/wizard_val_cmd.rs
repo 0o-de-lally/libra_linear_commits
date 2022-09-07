@@ -303,11 +303,13 @@ pub fn write_account_json(
     wizard_config: Option<AppCfg>,
     autopay_batch: Option<Vec<PayInstruction>>,
     autopay_signed: Option<Vec<SignedTransaction>>,
-) {
+) -> Result<(), anyhow::Error> {
     let cfg = wizard_config.unwrap_or(app_config().clone());
     let json_path = json_path.clone().unwrap_or(cfg.workspace.node_home.clone());
     let keys = KeyScheme::new(&wallet);
-    let block = VDFProof::parse_block_file(cfg.get_block_dir().join("proof_0.json").to_owned());
+    let block = VDFProof::parse_block_file(
+      cfg.get_block_dir().join("proof_0.json").to_owned()
+  )?;
 
     ValConfigs::new(
         Some(block),
@@ -317,7 +319,9 @@ pub fn write_account_json(
         autopay_batch,
         autopay_signed,
     )
-    .create_manifest(json_path);
+    .create_manifest(json_path)?;
+    
+    Ok(())
 }
 
 fn get_genesis_and_make_node_files(
