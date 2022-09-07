@@ -55,15 +55,15 @@ fn wizard(path: PathBuf, block_zero: &Option<PathBuf>) -> Result<(), Error> {
     app_cfg.profile.account = account;
 
     // Create block zero, if there isn't one.
-    let block;
+    let proof: VDFProof;
     if let Some(block_path) = block_zero {
-        block = VDFProof::parse_block_file(block_path.to_owned());
+        proof = VDFProof::parse_block_file(block_path.to_owned())?;
     } else {
-        block = write_genesis(&app_cfg)?;
+        proof = write_genesis(&app_cfg)?;
     }
 
     // Create Manifest
-    account::UserConfigs::new(block).create_manifest(path);
+    account::UserConfigs::new(proof).create_manifest(path);
     Ok(())
 }
 

@@ -34,11 +34,14 @@ impl VDFProof {
     }
 
     /// new object deserialized from file
-    pub fn parse_block_file(path: PathBuf) -> VDFProof {
-        let file = fs::File::open(&path)
-            .expect(&format!("Could not open block file: {:?}", path.to_str()));
+    pub fn parse_block_file(path: PathBuf) -> Result<VDFProof, anyhow::Error> {
+        let file = fs::File::open(&path)?;
+        
         let reader = BufReader::new(file);
-        serde_json::from_reader(reader).unwrap()
+
+        let vdf = serde_json::from_reader(reader)?;
+
+        Ok(vdf)
     }
 
     /// get the difficulty/iterations of the block, or assume legacy

@@ -46,13 +46,14 @@ impl Runnable for FixCmd {
         }
 
         if self.account {
-            migrate_account_json(&cfg);
+            migrate_account_json(&cfg)
+            .expect("could not migrate account json");
         }
     }
 }
 
 /// fixes account json
-pub fn migrate_account_json(cfg: &AppCfg) {
+pub fn migrate_account_json(cfg: &AppCfg) -> Result<(), anyhow::Error>{
     let (_, _, wallet) = wallet::get_account_from_prompt();
     let home_path = cfg.workspace.node_home.clone();
     println!("Reading autopay configs");
@@ -87,6 +88,7 @@ pub fn migrate_account_json(cfg: &AppCfg) {
         autopay_batch,
         autopay_signed,
     );
+    Ok(())
 }
 
 /// migrate autopay.json for archive purposes
