@@ -6627,6 +6627,7 @@ dependencies = [
  "rand 0.8.4",
  "smoke-test",
  "tokio 1.18.2",
+ "vm-genesis",
 ]
 
 [[package]]

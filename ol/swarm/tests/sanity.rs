@@ -5,7 +5,7 @@ use forge::NodeExt;
 #[tokio::test]
 
 async fn ol_sanity() {
-    let swarm = OLSwarm::new().await.unwrap().get_inner();
+    let swarm = OLSwarm::run().await.unwrap().get_inner();
     let client = swarm.validators().next().unwrap().rest_client();
 
     let b = client.get_account_balances(AccountAddress::ZERO).await.unwrap();

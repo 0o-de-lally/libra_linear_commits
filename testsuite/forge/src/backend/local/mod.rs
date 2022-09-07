@@ -11,7 +11,7 @@ use std::{
     sync::Arc,
 };
 
-mod cargo;
+pub mod cargo;
 mod node;
 mod swarm;
 pub use node::LocalNode;
