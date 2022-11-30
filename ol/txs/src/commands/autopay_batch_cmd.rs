@@ -71,6 +71,7 @@ impl Runnable for AutopayBatchCmd {
             &tx_params,
             entry_args.no_send,
             entry_args.save_path,
+            false,
         ) {
             Ok(_) => {}
             Err(e) => println!("ERROR: could not batch transactions, message: {:?}", e),

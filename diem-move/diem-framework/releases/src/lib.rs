@@ -63,7 +63,9 @@ impl ReleaseFetcher {
 
     /// Load the serialized modules from the specified release.
     pub fn module_blobs(&self) -> Result<Vec<Vec<u8>>> {
-        Ok(self
+      dbg!(&self.release);
+
+      Ok(self
             .modules()?
             .into_iter()
             .map(|module| {

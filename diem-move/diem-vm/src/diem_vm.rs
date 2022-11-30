@@ -967,6 +967,7 @@ impl VMAdapter for DiemVM {
             PreprocessedTransaction::InvalidSignature => {
                 let (vm_status, output) =
                     discard_error_vm_status(VMStatus::Error(StatusCode::INVALID_SIGNATURE));
+                dbg!(&output);
                 (vm_status, output, None)
             }
             PreprocessedTransaction::StateCheckpoint => {

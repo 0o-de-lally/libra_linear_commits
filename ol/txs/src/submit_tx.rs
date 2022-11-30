@@ -133,13 +133,18 @@ pub fn save_dont_send_tx(
 }
 
 /// convenience for wrapping multiple transactions
+/// WARNING: THIS IS NOT ATOMIC!
+/// The user now has two options:
+/// 1. Use this function to wrap multiple transactions, and the ones that fail, the user can manually retry based on a list that is returned.
+/// 2. The user can make the batch exit eagerly on the first failure.
 pub fn batch_wrapper(
     batch: Vec<TransactionPayload>,
     tx_params: &TxParams,
     no_send: bool,
     save_path: Option<PathBuf>,
-) -> Result<(), Error> {
-    batch.into_iter().enumerate().for_each(|(i, s)| {
+    fail_fast: bool,
+) -> Result<(), Vec<TxError>> {
+      let closure = |(i: u8, s: TransactionPayload)| {
         // TODO: format path for batch scripts
 
         let new_path = match &save_path {
@@ -149,12 +154,37 @@ pub fn batch_wrapper(
 
         // TODO: handle saving of batches to file.
         // The user may be expecting the batch transaction to be atomic.
-        if no_send {
-            save_dont_send_tx(s.clone(), tx_params, new_path).unwrap();
+        let tx = if no_send {
+            save_dont_send_tx(s.clone(), tx_params, new_path).err()
         } else {
-            maybe_submit(s, tx_params, new_path).unwrap();
-        }
-    });
+            maybe_submit(s, tx_params, new_path).err()
+        };
+
+
+
+        return tx
+    };
+
+        if fail_fast {
+          // exit the closure and stop the loop
+
+
+
+      let all_errs: Option<TxError> = batch
+      .into_iter()
+      .enumerate()
+      .find_map(closure);
+    }
+
+    let all_errs: Vec<TxError> = batch
+    .into_iter()
+    .enumerate()
+    .filter_map(closure)
+    .collect();
+
+    if !all_errs.is_empty() {
+      return Err(all_errs)
+    }
     Ok(())
 }
 
@@ -631,3 +661,4 @@ pub fn eval_tx_status(result: TransactionView) -> Result<TransactionView, TxErro
 //         }
 //     }
 // }
+

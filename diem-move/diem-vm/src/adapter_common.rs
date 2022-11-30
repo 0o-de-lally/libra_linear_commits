@@ -89,9 +89,13 @@ pub fn validate_signed_transaction<A: VMAdapter>(
     let txn_sender = transaction.sender();
     let log_context = AdapterLogSchema::new(state_view.id(), 0);
 
+    dbg!(&transaction);
     let txn = match A::check_signature(transaction) {
+        
         Ok(t) => t,
         _ => {
+            dbg!("======= bad signature ========");
+            
             return VMValidatorResult::error(StatusCode::INVALID_SIGNATURE);
         }
     };
