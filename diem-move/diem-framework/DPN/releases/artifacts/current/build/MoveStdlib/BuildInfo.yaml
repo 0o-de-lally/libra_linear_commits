@@ -44,7 +44,7 @@ compiled_package_info:
   build_flags:
     dev_mode: false
     test_mode: false
-    generate_docs: true
+    generate_docs: false
     generate_abis: true
     install_dir: DPN/releases/artifacts/current
     force_recompilation: false

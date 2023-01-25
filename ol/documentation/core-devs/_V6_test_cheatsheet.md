@@ -1,5 +1,7 @@
-## Build Move Binaries
-Usually a safe bet to do this before any tests. Smoketests and Forge tests depend on this step. 
+## Check your Move code, or Build Move Binaries
+When editing system contracts (framework) you want to be able to quickly compile.
+
+Also it's usually a safe bet to do this before any tests. Smoketests and Forge tests depend on this step. 
 
 Functional aka transactional tests do not depend on this step (but things could get weird if the binary outputs are not found in the right places).
 

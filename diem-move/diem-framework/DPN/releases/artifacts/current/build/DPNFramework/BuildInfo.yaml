@@ -161,10 +161,16 @@ compiled_package_info:
       name: Hash
     : Std
     ? address: "00000000000000000000000000000001"
+      name: InfraEscrow
+    : DiemFramework
+    ? address: "00000000000000000000000000000001"
       name: Jail
     : DiemFramework
     ? address: "00000000000000000000000000000001"
       name: MakeWhole
+    : DiemFramework
+    ? address: "00000000000000000000000000000001"
+      name: MigrateBalance
     : DiemFramework
     ? address: "00000000000000000000000000000001"
       name: MigrateJail
@@ -313,11 +319,11 @@ compiled_package_info:
     ? address: "00000000000000000000000000000001"
       name: XUS
     : DiemFramework
-  source_digest: 6FE88762F2E1A750B12C4166250C66AAE205A92570EF975EEBA86738CABDE2A2
+  source_digest: 2DE8469A57B8D3E30382C51F59DD40C6D458E282839E22B48D6A1C4C14F9229D
   build_flags:
     dev_mode: false
     test_mode: false
-    generate_docs: true
+    generate_docs: false
     generate_abis: true
     install_dir: DPN/releases/artifacts/current
     force_recompilation: false
