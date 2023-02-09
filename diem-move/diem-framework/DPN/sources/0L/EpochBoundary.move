@@ -222,6 +222,10 @@ module EpochBoundary {
         outgoing_compliant: vector<address>,
         height_now: u64
     ) {
+
+      // TODO: where to place the Jail reputation reset
+      // Jail::remove_consecutive_fail(vm, addr);
+
         print(&800900100);
 
         // Reset Stats
