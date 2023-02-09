@@ -344,6 +344,8 @@
   print(&8006010202);
   <b>let</b> sorted_vals_by_bid = <a href="ProofOfFee.md#0x1_ProofOfFee_get_sorted_vals">get_sorted_vals</a>();
 
+  // print(&sorted_vals_by_bid);
+
   <b>let</b> i = 0u64;
   <b>while</b> (
     (i &lt; set_size) &&
@@ -387,6 +389,8 @@
       <b>continue</b>
     };
 
+
+    <b>if</b> (!<a href="Vouch.md#0x1_Vouch_unrelated_buddies_above_thresh">Vouch::unrelated_buddies_above_thresh</a>(*val)) <b>continue</b>;
 
     // check <b>if</b> a proven node
     <b>if</b> (<a href="../../../../../../../DPN/releases/artifacts/current/build/MoveStdlib/docs/Vector.md#0x1_Vector_contains">Vector::contains</a>(proven_nodes, val)) {
