@@ -168,6 +168,8 @@ address DiemFramework {
       print(&8006010202);
       let sorted_vals_by_bid = get_sorted_vals();
 
+      // print(&sorted_vals_by_bid);
+
       let i = 0u64;
       while (
         (i < set_size) && 
@@ -211,6 +213,8 @@ address DiemFramework {
           continue
         };
         
+
+        if (!Vouch::unrelated_buddies_above_thresh(*val)) continue;
 
         // check if a proven node
         if (Vector::contains(proven_nodes, val)) {
