@@ -32,6 +32,7 @@ module EpochBoundary {
     // use DiemFramework::Cases;
     use DiemFramework::Jail;
     use DiemFramework::TransactionFee;
+    use DiemFramework::MusicalChairs;
 
     //// V6 ////
     // THIS IS TEMPORARY
@@ -49,8 +50,8 @@ module EpochBoundary {
         let height_start = Epoch::get_timer_height_start();
         print(&800100);        
         
-        let (outgoing_compliant_set, _) = 
-            DiemSystem::get_fee_ratio(vm, height_start, height_now);
+        let (outgoing_compliant_set, new_set_size) = 
+            MusicalChairs::stop_the_music(vm, height_start, height_now);
         
         print(&800200);
 
@@ -72,7 +73,7 @@ module EpochBoundary {
         print(&800600);
 
 
-        let proposed_set = propose_new_set(vm, &outgoing_compliant_set);
+        let proposed_set = propose_new_set(vm, &outgoing_compliant_set, new_set_size);
 
 
         // Update all slow wallet limits
@@ -168,7 +169,7 @@ module EpochBoundary {
         };
     }
 
-    fun propose_new_set(vm: &signer, outgoing_compliant_set: &vector<address>): vector<address> 
+    fun propose_new_set(vm: &signer, outgoing_compliant_set: &vector<address>, new_set_size: u64): vector<address> 
     {
         let proposed_set = Vector::empty<address>();
 
@@ -182,7 +183,7 @@ module EpochBoundary {
             //// V6 ////
             // CONSENSUS CRITICAL
             // pick the validators based on proof of fee.
-            let (auction_winners, price) = ProofOfFee::fill_seats_and_get_price(vm, MOCK_VAL_SIZE, outgoing_compliant_set);
+            let (auction_winners, price) = ProofOfFee::fill_seats_and_get_price(vm, new_set_size, outgoing_compliant_set);
             // TODO: Don't use copy above, do a borrow.
             print(&800700);
 
