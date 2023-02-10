@@ -319,7 +319,7 @@ compiled_package_info:
     ? address: "00000000000000000000000000000001"
       name: XUS
     : DiemFramework
-  source_digest: 9E38550D0B4C6509A3D7AB760BD5904019641488AADA827E3F3D5C49761F4FB1
+  source_digest: C9C7AAC22521B1F276CEB5D4C8A689C2950B41E5D6EEF0139754AF80E851DB5C
   build_flags:
     dev_mode: false
     test_mode: false
