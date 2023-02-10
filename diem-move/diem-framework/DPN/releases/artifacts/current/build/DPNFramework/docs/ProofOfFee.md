@@ -344,8 +344,6 @@
   print(&8006010202);
   <b>let</b> sorted_vals_by_bid = <a href="ProofOfFee.md#0x1_ProofOfFee_get_sorted_vals">get_sorted_vals</a>();
 
-  // print(&sorted_vals_by_bid);
-
   <b>let</b> i = 0u64;
   <b>while</b> (
     (i &lt; set_size) &&
@@ -390,7 +388,37 @@
     };
 
 
-    <b>if</b> (!<a href="Vouch.md#0x1_Vouch_unrelated_buddies_above_thresh">Vouch::unrelated_buddies_above_thresh</a>(*val)) <b>continue</b>;
+    // NOTE: I know the multiple i = i+1 is ugly, but debugging
+    // is much harder <b>if</b> we have all the checks in one '<b>if</b>' statement.
+    print(&8006010203);
+    <b>if</b> (<a href="Jail.md#0x1_Jail_is_jailed">Jail::is_jailed</a>(*val)) {
+      i = i + 1;
+      <b>continue</b>
+    };
+    print(&8006010204);
+    <b>if</b> (!<a href="Vouch.md#0x1_Vouch_unrelated_buddies_above_thresh">Vouch::unrelated_buddies_above_thresh</a>(*val)) {
+      i = i + 1;
+      <b>continue</b>
+    };
+
+    print(&80060102041);
+    // skip the user <b>if</b> they don't have sufficient UNLOCKED funds
+    // or <b>if</b> the bid expired.
+
+    // belt and suspenders, expiry
+    <b>if</b> (<a href="DiemConfig.md#0x1_DiemConfig_get_current_epoch">DiemConfig::get_current_epoch</a>() &gt; expire) {
+      i = i + 1;
+      <b>continue</b>
+    };
+
+    <b>let</b> coin_required = bid * baseline_reward;
+    <b>if</b> (
+      <a href="DiemAccount.md#0x1_DiemAccount_unlocked_amount">DiemAccount::unlocked_amount</a>(*val) &lt; coin_required
+    ) {
+      i = i + 1;
+      <b>continue</b>
+    };
+
 
     // check <b>if</b> a proven node
     <b>if</b> (<a href="../../../../../../../DPN/releases/artifacts/current/build/MoveStdlib/docs/Vector.md#0x1_Vector_contains">Vector::contains</a>(proven_nodes, val)) {
