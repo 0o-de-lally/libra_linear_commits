@@ -36,7 +36,7 @@ module DiemFramework::Genesis {
     use DiemFramework::TowerState;
     use DiemFramework::Wallet;
     use DiemFramework::Migrations;  
-    // use DiemFramework::Testnet; 
+    use DiemFramework::MusicalChairs; 
 
     /// Initializes the Diem framework.
     fun initialize(
@@ -158,6 +158,7 @@ module DiemFramework::Genesis {
         Wallet::init(dr_account);
         DiemAccount::vm_init_slow(dr_account);
         Migrations::init(dr_account);
+        MusicalChairs::initialize(dr_account);
 
         // After we have called this function, all invariants which are guarded by
         // `DiemTimestamp::is_operating() ==> ...` will become active and a verification condition.
