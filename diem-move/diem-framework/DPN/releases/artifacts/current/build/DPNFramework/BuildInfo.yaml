@@ -224,6 +224,9 @@ compiled_package_info:
       name: PersistenceDemo
     : DiemFramework
     ? address: "00000000000000000000000000000001"
+      name: PledgeAccounts
+    : DiemFramework
+    ? address: "00000000000000000000000000000001"
       name: ProofOfFee
     : DiemFramework
     ? address: "00000000000000000000000000000001"
@@ -349,7 +352,7 @@ compiled_package_info:
     ? address: "00000000000000000000000000000001"
       name: XUS
     : DiemFramework
-  source_digest: A5D2C6F20AC5E12BA8A8A6167D118FDC4F0404D311CE72F0BC9928353DC69318
+  source_digest: 12AA381AACC39F9BAB66E8939D9245DB26DF882E88F9DA549C79D8992B74FDA1
   build_flags:
     dev_mode: false
     test_mode: false
