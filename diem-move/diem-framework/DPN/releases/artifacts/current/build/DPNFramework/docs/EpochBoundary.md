@@ -285,8 +285,12 @@
         // CONSENSUS CRITICAL
         // pick the validators based on proof of fee.
 <<<<<<< HEAD
+<<<<<<< HEAD
         <b>let</b> (auction_winners, price) = <a href="ProofOfFee.md#0x1_ProofOfFee_fill_seats_and_get_price">ProofOfFee::fill_seats_and_get_price</a>(vm, new_set_size, outgoing_compliant_set);
 =======
+=======
+        // <b>false</b> because we want the default behavior of the function: filtered by audit
+>>>>>>> 4e31a857f8 (add unit tests for thermostat. Patch a couple bugs)
         <b>let</b> sorted_bids = <a href="ProofOfFee.md#0x1_ProofOfFee_get_sorted_vals">ProofOfFee::get_sorted_vals</a>(<b>false</b>);
         <b>let</b> (auction_winners, price) = <a href="ProofOfFee.md#0x1_ProofOfFee_fill_seats_and_get_price">ProofOfFee::fill_seats_and_get_price</a>(vm, <a href="EpochBoundary.md#0x1_EpochBoundary_MOCK_VAL_SIZE">MOCK_VAL_SIZE</a>, &sorted_bids, outgoing_compliant_set);
 >>>>>>> 0e50c5330c (add test fixtures, modify some APIs "tell don't ask" pattern. Add several tests.)
@@ -372,7 +376,7 @@
     print(&800900106);
 
     // trigger the thermostat <b>if</b> the reward needs <b>to</b> be adjusted
-    <a href="ProofOfFee.md#0x1_ProofOfFee_reward_thermostat">ProofOfFee::reward_thermostat</a>(vm, &proposed_set);
+    <a href="ProofOfFee.md#0x1_ProofOfFee_reward_thermostat">ProofOfFee::reward_thermostat</a>(vm);
     print(&800900107);
     // Reconfig should be the last event.
     // Reconfigure the network
