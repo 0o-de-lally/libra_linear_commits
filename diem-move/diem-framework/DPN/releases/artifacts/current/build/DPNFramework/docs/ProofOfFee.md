@@ -23,6 +23,7 @@
 -  [Function `init_bidding`](#0x1_ProofOfFee_init_bidding)
 -  [Function `update_pof_bid`](#0x1_ProofOfFee_update_pof_bid)
 -  [Function `test_set_val_bids`](#0x1_ProofOfFee_test_set_val_bids)
+-  [Function `test_set_one_bid`](#0x1_ProofOfFee_test_set_one_bid)
 -  [Function `test_mock_reward`](#0x1_ProofOfFee_test_mock_reward)
 
 
@@ -925,11 +926,36 @@ find the median bid to push to history
     <b>let</b> bid = <a href="../../../../../../../DPN/releases/artifacts/current/build/MoveStdlib/docs/Vector.md#0x1_Vector_borrow">Vector::borrow</a>(bids, i);
     <b>let</b> exp = <a href="../../../../../../../DPN/releases/artifacts/current/build/MoveStdlib/docs/Vector.md#0x1_Vector_borrow">Vector::borrow</a>(expiry, i);
     <b>let</b> addr = <a href="../../../../../../../DPN/releases/artifacts/current/build/MoveStdlib/docs/Vector.md#0x1_Vector_borrow">Vector::borrow</a>(vals, i);
-    <b>let</b> pof = <b>borrow_global_mut</b>&lt;<a href="ProofOfFee.md#0x1_ProofOfFee_ProofOfFeeAuction">ProofOfFeeAuction</a>&gt;(*addr);
-    pof.epoch_expiration = *exp;
-    pof.bid = *bid;
+    <a href="ProofOfFee.md#0x1_ProofOfFee_test_set_one_bid">test_set_one_bid</a>(vm, addr, *bid, *exp);
     i = i + 1;
   };
+}
+</code></pre>
+
+
+
+</details>
+
+<a name="0x1_ProofOfFee_test_set_one_bid"></a>
+
+## Function `test_set_one_bid`
+
+
+
+<pre><code><b>public</b> <b>fun</b> <a href="ProofOfFee.md#0x1_ProofOfFee_test_set_one_bid">test_set_one_bid</a>(vm: &signer, val: &<b>address</b>, bid: u64, exp: u64)
+</code></pre>
+
+
+
+<details>
+<summary>Implementation</summary>
+
+
+<pre><code><b>public</b> <b>fun</b> <a href="ProofOfFee.md#0x1_ProofOfFee_test_set_one_bid">test_set_one_bid</a>(vm: &signer, val: &<b>address</b>, bid:  u64, exp: u64) <b>acquires</b> <a href="ProofOfFee.md#0x1_ProofOfFee_ProofOfFeeAuction">ProofOfFeeAuction</a> {
+  <a href="Testnet.md#0x1_Testnet_assert_testnet">Testnet::assert_testnet</a>(vm);
+  <b>let</b> pof = <b>borrow_global_mut</b>&lt;<a href="ProofOfFee.md#0x1_ProofOfFee_ProofOfFeeAuction">ProofOfFeeAuction</a>&gt;(*val);
+  pof.epoch_expiration = exp;
+  pof.bid = bid;
 }
 </code></pre>
 
