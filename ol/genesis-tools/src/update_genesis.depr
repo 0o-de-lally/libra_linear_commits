@@ -1,0 +1,85 @@
+//! Using the e2e test helpers we create a MoveVm session from fake data to be able to apply migrations
+//! from Move system contracts. i.e. we don't craft the writesets
+//! manually in rust, instead we execute functions in a Move session.
+
+use diem_types::account_config;
+use diem_types::write_set::WriteSet;
+use diem_types::write_set::WriteSetMut;
+use language_e2e_tests::executor::FakeExecutor;
+use move_core_types::{
+    // language_storage::TypeTag,
+    value::{serialize_values, MoveValue},
+};
+use ol_types::legacy_recovery::LegacyRecovery;
+use vm_genesis::Validator;
+
+/// creates an executor vm session to create writesets
+pub fn start_vm_and_transform(
+    genesis_baseline: &WriteSet,
+    subset_of_legacy_accounts: Vec<LegacyRecovery>,
+) -> Result<WriteSet, anyhow::Error> {
+    let mut executor = FakeExecutor::from_genesis(genesis_baseline);
+
+
+    let a = executor.try_exec(
+          "Genesis",
+          "create_initialize_owners_operators",
+          vec![],
+          serialize_values(&create_val_genesis_args()?),
+      )?;
+    
+    // let a = executor.try_exec(
+    //             "DiemSystem".to_string(),
+    //             "bulk_update_validators".to_string(),
+    //             type_params.clone().unwrap_or(vec![]),
+    //             serialize_values(&args),
+    //         )?;
+
+    WriteSetMut::new(a).freeze()
+}
+
+
+fn create_val_genesis_args(
+    validators: &[Validator],
+) -> anyhow::Result<Vec<MoveValue>>{
+    let diem_root_address = account_config::diem_root_address();
+    let mut owners = vec![];
+    let mut owner_names = vec![];
+    let mut owner_auth_keys = vec![];
+    let mut operators = vec![];
+    let mut operator_names = vec![];
+    let mut operator_auth_keys = vec![];
+    let mut consensus_pubkeys = vec![];
+    let mut validator_network_addresses = vec![];
+    let mut full_node_network_addresses = vec![];
+
+    for v in validators {
+        println!("Address: {:?}", &v.address);
+        owners.push(MoveValue::Signer(v.address));
+        owner_names.push(MoveValue::vector_u8(v.name.clone()));
+        owner_auth_keys.push(MoveValue::vector_u8(v.auth_key.to_vec()));
+        consensus_pubkeys.push(MoveValue::vector_u8(v.consensus_pubkey.clone()));
+        operators.push(MoveValue::Signer(v.operator_address));
+        operator_names.push(MoveValue::vector_u8(v.operator_name.clone()));
+        operator_auth_keys.push(MoveValue::vector_u8(v.operator_auth_key.to_vec()));
+        validator_network_addresses.push(MoveValue::vector_u8(v.network_address.clone()));
+        full_node_network_addresses.push(MoveValue::vector_u8(v.full_node_network_address.clone()));
+    }
+
+
+    Ok(
+      vec![
+            MoveValue::Signer(diem_root_address),
+            MoveValue::Vector(owners),
+            MoveValue::Vector(owner_names),
+            MoveValue::Vector(owner_auth_keys),
+            MoveValue::Vector(consensus_pubkeys),
+            MoveValue::Vector(operators),
+            MoveValue::Vector(operator_names),
+            MoveValue::Vector(operator_auth_keys),
+            MoveValue::Vector(validator_network_addresses),
+            MoveValue::Vector(full_node_network_addresses),
+        ]
+    )
+
+}

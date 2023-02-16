@@ -29,6 +29,7 @@ fn test_parse_json_for_one_validator_and_save_blob() {
       genesis_vals.clone(),
       temp_genesis_blob_path.clone(), 
       true,
+      None,
     )
     .unwrap();
 

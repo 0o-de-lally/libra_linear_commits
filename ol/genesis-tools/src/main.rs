@@ -93,7 +93,8 @@ async fn main() -> Result<()> {
               &recovery,
               vec![],
               output_path, 
-              opts.legacy
+              opts.legacy,
+              None
             )
                 .expect("ERROR: failed to create genesis from recovery file");
             Ok(())

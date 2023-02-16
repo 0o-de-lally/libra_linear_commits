@@ -37,6 +37,7 @@ fn test_end_user_migrate() {
       genesis_vals.clone(),
       temp_genesis_blob_path.clone(), 
       true,
+      None,
       // TODO: add validators
     )
     .unwrap();

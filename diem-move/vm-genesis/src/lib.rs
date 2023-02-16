@@ -203,6 +203,7 @@ pub fn encode_recovery_genesis_changeset(
     chain: u8,
     append_users: bool,
     legacy_data: &[LegacyRecovery],
+    test_vals: Option<(&[ValStateRecover], &[OperRecover])>
 ) -> Result<ChangeSet, Error> {
     let mut stdlib_modules = Vec::new();
     // create a data view for move_vm
@@ -251,6 +252,32 @@ pub fn encode_recovery_genesis_changeset(
     // Trigger reconfiguration so that the validator set is updated.
     // genesis cannot start without a reconfiguration event.
     reconfigure(&mut session);
+
+    // Is this for testing? Then we need to change the validator set
+    // with test accounts (swarm or other).
+    // so we run the recover owners operators again on those
+    if let Some((val, oper)) = test_vals {
+        diem_logger::info!("Replacing valiators for testing... ");
+        
+        let set: Vec<AccountAddress> = val.iter().map(|v| v.val_account).collect::<Vec<_>>();
+        recovery_owners_operators(
+            &mut session, val, oper, &set
+        );
+        
+        let mv_val: Vec<MoveValue> = val.iter().map(|v| MoveValue::Address(v.val_account)).collect::<Vec<_>>();
+
+        exec_function(
+            &mut session,
+            "DiemSystem",
+            "bulk_update_validators",
+            vec![],
+            serialize_values(&vec![
+                MoveValue::Signer(account_config::diem_root_address()),
+                MoveValue::Vector(mv_val),
+            ]),
+        );
+    }
+
 
     let (mut changeset1, mut events1) = session.finish().unwrap();
 

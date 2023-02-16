@@ -11,5 +11,6 @@ pub fn read_db_and_compute_genesis(
 ) -> Result<(DbReaderWriter, Waypoint), anyhow::Error> {
     let db_path = TempPath::new();
     let (db_rw, expected_waypoint) = compute_genesis(&genesis_path, db_path.path())?;
+    
     Ok((db_rw, expected_waypoint))
 }

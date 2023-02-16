@@ -28,7 +28,8 @@ async fn test_parse_json_for_all_users_and_save_blob() {
       &recovery,
       genesis_vals.clone(),
       output_path.clone(), 
-      true
+      true,
+      None,
     )
         .expect("ERROR: failed to create genesis from recovery file");
 
@@ -58,7 +59,8 @@ async fn test_parse_json_for_validators_and_save_blob() {
       &recovery,
       genesis_vals.clone(),
       output_path.clone(), 
-      false
+      false,
+      None,
     )
         .expect("ERROR: failed to create genesis from recovery file");
 
