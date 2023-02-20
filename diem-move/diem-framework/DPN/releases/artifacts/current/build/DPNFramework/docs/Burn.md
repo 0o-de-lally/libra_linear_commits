@@ -13,8 +13,10 @@
 -  [Function `get_payee_value`](#0x1_Burn_get_payee_value)
 -  [Function `burn_or_recycle_user_fees`](#0x1_Burn_burn_or_recycle_user_fees)
 -  [Function `recycle`](#0x1_Burn_recycle)
+-  [Function `send_coin_to_comm_wallet`](#0x1_Burn_send_coin_to_comm_wallet)
 -  [Function `set_send_community`](#0x1_Burn_set_send_community)
 -  [Function `get_ratios`](#0x1_Burn_get_ratios)
+-  [Function `get_user_pref`](#0x1_Burn_get_user_pref)
 
 
 <pre><code><b>use</b> <a href="CoreAddresses.md#0x1_CoreAddresses">0x1::CoreAddresses</a>;
@@ -337,6 +339,8 @@
   <b>let</b> value_sent = 0;
 
   <b>let</b> i = 0;
+
+
   <b>while</b> (i &lt; len) {
 
     <b>let</b> payee = *<a href="../../../../../../../DPN/releases/artifacts/current/build/MoveStdlib/docs/Vector.md#0x1_Vector_borrow">Vector::borrow</a>&lt;<b>address</b>&gt;(&list, i);
@@ -354,6 +358,42 @@
     value_sent = value_sent + amount_to_payee;
     i = i + 1;
   };
+}
+</code></pre>
+
+
+
+</details>
+
+<a name="0x1_Burn_send_coin_to_comm_wallet"></a>
+
+## Function `send_coin_to_comm_wallet`
+
+
+
+<pre><code><b>fun</b> <a href="Burn.md#0x1_Burn_send_coin_to_comm_wallet">send_coin_to_comm_wallet</a>(vm: &signer, comm_wallet: <b>address</b>, coin: <a href="Diem.md#0x1_Diem_Diem">Diem::Diem</a>&lt;<a href="GAS.md#0x1_GAS_GAS">GAS::GAS</a>&gt;)
+</code></pre>
+
+
+
+<details>
+<summary>Implementation</summary>
+
+
+<pre><code><b>fun</b> <a href="Burn.md#0x1_Burn_send_coin_to_comm_wallet">send_coin_to_comm_wallet</a>(
+  vm: &signer,
+  comm_wallet: <b>address</b>,
+  coin: <a href="Diem.md#0x1_Diem_Diem">Diem::Diem</a>&lt;<a href="GAS.md#0x1_GAS">GAS</a>&gt;,
+) {
+  <a href="CoreAddresses.md#0x1_CoreAddresses_assert_vm">CoreAddresses::assert_vm</a>(vm);
+  <a href="DiemAccount.md#0x1_DiemAccount_deposit">DiemAccount::deposit</a>(
+    @VMReserved,
+    comm_wallet,
+    coin,
+    b"epoch burn",
+    b"",
+    <b>false</b>,
+  );
 }
 </code></pre>
 
@@ -413,6 +453,30 @@
 {
   <b>let</b> d = <b>borrow_global</b>&lt;<a href="Burn.md#0x1_Burn_DepositInfo">DepositInfo</a>&gt;(@VMReserved);
   (*&d.addr, *&d.deposits, *&d.ratio)
+}
+</code></pre>
+
+
+
+</details>
+
+<a name="0x1_Burn_get_user_pref"></a>
+
+## Function `get_user_pref`
+
+
+
+<pre><code><b>public</b> <b>fun</b> <a href="Burn.md#0x1_Burn_get_user_pref">get_user_pref</a>(user: &<b>address</b>): bool
+</code></pre>
+
+
+
+<details>
+<summary>Implementation</summary>
+
+
+<pre><code><b>public</b> <b>fun</b> <a href="Burn.md#0x1_Burn_get_user_pref">get_user_pref</a>(user: &<b>address</b>): bool <b>acquires</b> <a href="Burn.md#0x1_Burn_BurnPreference">BurnPreference</a>{
+  <b>borrow_global</b>&lt;<a href="Burn.md#0x1_Burn_BurnPreference">BurnPreference</a>&gt;(*user).send_community
 }
 </code></pre>
 

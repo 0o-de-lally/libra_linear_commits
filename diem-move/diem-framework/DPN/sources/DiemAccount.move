@@ -15,6 +15,7 @@ module DiemFramework::DiemAccount {
     friend DiemFramework::Mock;
     friend DiemFramework::PledgeAccounts;
     friend DiemFramework::Subsidy;
+    friend DiemFramework::Burn;
 
 
     use DiemFramework::AccountFreezing;
@@ -2524,8 +2525,8 @@ module DiemFramework::DiemAccount {
     /// 0L change, return zero if it doesn't hold balance. 
     /// In case the VM calls this on a bad account it won't halt
     public fun balance<Token>(addr: address): u64 acquires Balance {
-        // if (!exists<Balance<Token>>(addr)) { return 0 }; // todo //////// 0L //////// 
-        assert!(exists<Balance<Token>>(addr), Errors::not_published(EPAYER_DOESNT_HOLD_CURRENCY));
+        if (!exists<Balance<Token>>(addr)) { return 0 }; //////// 0L //////// 
+        // assert!(exists<Balance<Token>>(addr), Errors::not_published(EPAYER_DOESNT_HOLD_CURRENCY));
         balance_for(borrow_global<Balance<Token>>(addr))
     }
     spec balance {
