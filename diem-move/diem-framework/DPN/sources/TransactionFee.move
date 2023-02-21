@@ -264,12 +264,13 @@ module DiemFramework::TransactionFee {
         );
 
         Diem::withdraw_all(&mut fees.balance)
+        
     }
 
     /////// 0L /////////
     // TODO deprecate this
     public fun get_transaction_fees_coins_amount<Token: store>(
-        dr_account: &signer, amount: u64
+        dr_account: &signer, withdraw: u64
     ): Diem<Token>  acquires TransactionFee {
         // Can only be invoked by DiemVM privilege.
         // Allowed association to invoke for testing purposes.
@@ -280,7 +281,13 @@ module DiemFramework::TransactionFee {
             @DiemRoot
         );
 
-        Diem::withdraw(&mut fees.balance, amount)
+        let amount_collected = Diem::value(&fees.balance);
+        if ((amount_collected > withdraw) && (withdraw > 0)) {
+          Diem::withdraw(&mut fees.balance, withdraw)
+        } else {
+           Diem::withdraw_all(&mut fees.balance)
+        }
+
     }
 
     /// FeeMaker struct lives on an individual's account
