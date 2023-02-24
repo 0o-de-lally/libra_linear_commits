@@ -524,8 +524,7 @@ testnet-genesis: genesis set-waypoint
 
 	make verify-gen
 
-testnet-fork-genesis: fork-genesis set-waypoint verify-gen
-
+testnet-fork-genesis: fork-files set-waypoint
 
 #### 2. TESTNET START ####
 
@@ -577,30 +576,28 @@ sw-tx:
 
 ##### FORK TESTS #####
 
-fork: stdlib fork-genesis fork-config fork-start
-
 EPOCH_HEIGHT = $(shell cargo r -p ol -- query --epoch | cut -d ":" -f 2)
 
 epoch:
 	cargo r -p ol -- query --epoch
 	echo ${EPOCH_HEIGHT}
 
-fork-backup:
-		rm -rf ${SOURCE}/ol/TEST/snapshot/*
-		cargo run -p backup-cli --bin db-backup -- one-shot backup --backup-service-address http://localhost:6186 state-snapshot --state-version ${EPOCH_HEIGHT} local-fs --dir ${SOURCE}/ol/TEST/snapshot/
+# fork-backup:
+# 		rm -rf ${SOURCE}/ol/TEST/snapshot/*
+# 		cargo run -p backup-cli --bin db-backup -- one-shot backup --backup-service-address http://localhost:6186 state-snapshot --state-version ${EPOCH_HEIGHT} local-fs --dir ${SOURCE}/ol/TEST/snapshot/
 
-# Make genesis file
-fork-genesis:
-		cargo run -p ol-genesis-tools -- --genesis ${DATA_PATH}/genesis_from_snapshot.blob --snapshot ${SOURCE}/ol/TEST/snapshot/state_ver*
+# # Make genesis file
+# fork-genesis:
+# 		cargo run -p ol-genesis-tools -- --genesis ${DATA_PATH}/genesis_from_snapshot.blob --snapshot ${SOURCE}/ol/TEST/snapshot/state_ver*
 
-# Use onboard to create all node files
-fork-config:
-	cargo run -p onboard -- fork -u http://167.172.248.37 --prebuilt-genesis ${DATA_PATH}/genesis_from_snapshot.blob
+# # Use onboard to create all node files
+# fork-config:
+# 	cargo run -p onboard -- fork -u http://167.172.248.37 --prebuilt-genesis ${DATA_PATH}/genesis_from_snapshot.blob
 
-# start node from files
-fork-start:
-	rm -rf ~/.0L/db
-	cargo run -p libra-node -- --config ~/.0L/validator.node.yaml
+# # start node from files
+# fork-start:
+# 	rm -rf ~/.0L/db
+# 	cargo run -p libra-node -- --config ~/.0L/validator.node.yaml
 
 ##### UTIL #####
 TAG=$(shell git tag -l "previous")
