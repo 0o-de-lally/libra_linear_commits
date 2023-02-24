@@ -524,6 +524,8 @@ testnet-genesis: genesis set-waypoint
 
 	make verify-gen
 
+testnet-fork-genesis: fork-genesis set-waypoint verify-gen
+
 
 #### 2. TESTNET START ####
 
