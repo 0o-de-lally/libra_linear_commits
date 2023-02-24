@@ -333,7 +333,6 @@ files:
 fork-files:
 	cargo run -p ol-genesis-tools ${CARGO_ARGS} -- \
 	--fork \
-	--debug \
 	--genesis-repo-owner ${REPO_ORG} \
 	--genesis-repo-name ${REPO_NAME} \
 	--genesis-gh-token ${GITHUB_TOKEN} \
@@ -446,8 +445,8 @@ extract-waypoint:
 
 set-waypoint:	
 	make extract-waypoint
-	sleep 1
-	cargo r -p ol -- init --update-waypoint --waypoint $(shell cat ${DATA_PATH}/genesis_waypoint.txt)
+	sleep 2
+	cat ~/.0L/genesis_waypoint.txt | xargs cargo r -p ol -- init --update-waypoint --waypoint
 
 	@echo waypoint:
 	@cat ${DATA_PATH}/genesis_waypoint.txt
