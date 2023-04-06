@@ -107,6 +107,7 @@ before and after every transaction.
 -  [Function `vm_migrate_slow_wallet`](#0x1_DiemAccount_vm_migrate_slow_wallet)
 -  [Function `vm_multi_pay_fee`](#0x1_DiemAccount_vm_multi_pay_fee)
 -  [Function `init_cumulative_deposits`](#0x1_DiemAccount_init_cumulative_deposits)
+-  [Function `vm_migrate_cumulative_deposits`](#0x1_DiemAccount_vm_migrate_cumulative_deposits)
 -  [Function `maybe_update_deposit`](#0x1_DiemAccount_maybe_update_deposit)
 -  [Function `deposit_index_curve`](#0x1_DiemAccount_deposit_index_curve)
 -  [Function `get_cumulative_deposits`](#0x1_DiemAccount_get_cumulative_deposits)
@@ -6816,7 +6817,7 @@ Create a Validator Operator account
 
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="DiemAccount.md#0x1_DiemAccount_init_cumulative_deposits">init_cumulative_deposits</a>(sender: &signer, starting_balance: u64)
+<pre><code><b>public</b>(<b>friend</b>) <b>fun</b> <a href="DiemAccount.md#0x1_DiemAccount_init_cumulative_deposits">init_cumulative_deposits</a>(sender: &signer, use_starting_balance: bool)
 </code></pre>
 
 
@@ -6825,8 +6826,13 @@ Create a Validator Operator account
 <summary>Implementation</summary>
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="DiemAccount.md#0x1_DiemAccount_init_cumulative_deposits">init_cumulative_deposits</a>(sender: &signer, starting_balance: u64) {
+<pre><code><b>public</b>(<b>friend</b>) <b>fun</b> <a href="DiemAccount.md#0x1_DiemAccount_init_cumulative_deposits">init_cumulative_deposits</a>(sender: &signer, use_starting_balance: bool) <b>acquires</b> <a href="DiemAccount.md#0x1_DiemAccount_Balance">Balance</a> {
   <b>let</b> addr = <a href="../../../../../../../DPN/releases/artifacts/current/build/MoveStdlib/docs/Signer.md#0x1_Signer_address_of">Signer::address_of</a>(sender);
+
+  <b>let</b> starting_balance = <b>if</b> (use_starting_balance) {
+    <a href="DiemAccount.md#0x1_DiemAccount_balance">balance</a>&lt;<a href="GAS.md#0x1_GAS">GAS</a>&gt;(addr)
+  } <b>else</b> { 0 };
+
 
   <b>if</b> (!<b>exists</b>&lt;<a href="DiemAccount.md#0x1_DiemAccount_CumulativeDeposits">CumulativeDeposits</a>&gt;(addr)) {
     <b>move_to</b>&lt;<a href="DiemAccount.md#0x1_DiemAccount_CumulativeDeposits">CumulativeDeposits</a>&gt;(sender, <a href="DiemAccount.md#0x1_DiemAccount_CumulativeDeposits">CumulativeDeposits</a> {
@@ -6834,6 +6840,31 @@ Create a Validator Operator account
       index: starting_balance,
     })
   };
+}
+</code></pre>
+
+
+
+</details>
+
+<a name="0x1_DiemAccount_vm_migrate_cumulative_deposits"></a>
+
+## Function `vm_migrate_cumulative_deposits`
+
+
+
+<pre><code><b>public</b> <b>fun</b> <a href="DiemAccount.md#0x1_DiemAccount_vm_migrate_cumulative_deposits">vm_migrate_cumulative_deposits</a>(vm: &signer, sender: &signer, use_starting_balance: bool)
+</code></pre>
+
+
+
+<details>
+<summary>Implementation</summary>
+
+
+<pre><code><b>public</b> <b>fun</b> <a href="DiemAccount.md#0x1_DiemAccount_vm_migrate_cumulative_deposits">vm_migrate_cumulative_deposits</a>(vm: &signer, sender: &signer, use_starting_balance: bool) <b>acquires</b> <a href="DiemAccount.md#0x1_DiemAccount_Balance">Balance</a> {
+  <a href="CoreAddresses.md#0x1_CoreAddresses_assert_diem_root">CoreAddresses::assert_diem_root</a>(vm);
+  <a href="DiemAccount.md#0x1_DiemAccount_init_cumulative_deposits">init_cumulative_deposits</a>(sender, use_starting_balance);
 }
 </code></pre>
 

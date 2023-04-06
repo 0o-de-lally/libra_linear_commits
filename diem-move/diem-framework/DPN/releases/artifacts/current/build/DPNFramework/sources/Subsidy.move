@@ -53,7 +53,7 @@ address DiemFramework {
     // use DiemFramework::ValidatorConfig;
     // use DiemFramework::TowerState;
     // use Std::FixedPoint32;
-    use DiemFramework::Debug::print;
+    // use DiemFramework::Debug::print;
 
 
     // const BASELINE_TX_COST: u64 = 4336; // microgas
@@ -100,7 +100,7 @@ address DiemFramework {
 
 
     //   // // Gets the transaction fees in the epoch
-    //   // let txn_fee_amount = TransactionFee::get_amount_to_distribute(vm);
+    //   // let txn_fee_amount = TransactionFee::get_fees_collected();
     //   // // Calculate the split for subsidy and burn
     //   // let subsidy_ceiling_gas = Globals::get_subsidy_ceiling_gas();
     //   // // TODO: This metric network density is different than 
@@ -214,7 +214,7 @@ address DiemFramework {
       let len = Vector::length<address>(outgoing_set);
 
       // reward per validator
-      print(&70001);
+      // print(&70001);
       let (reward_per, _, _) = ProofOfFee::get_consensus_reward();
 
       // // equal subsidy for all active validators
@@ -230,9 +230,9 @@ address DiemFramework {
       // as such there should be sufficient coins to pay (we should not get an overdrawn error), and we check for that above.
       
       let nominal_cost_to_network = reward_per * len;
-      print(&70002);
-      let balance_in_network_account = TransactionFee::get_amount_to_distribute(vm);
-      print(&balance_in_network_account);
+      // print(&70002);
+      let balance_in_network_account = TransactionFee::get_fees_collected();
+      // print(&balance_in_network_account);
       
       if (
         // the sum of consensus rewards should not be more than the
@@ -242,14 +242,14 @@ address DiemFramework {
         (balance_in_network_account < 1)
       ) return;
 
-      print(&70003);
+      // print(&70003);
       let check_sum = 0;      
       let i = 0;
       while (i < len) {
         // V6: there is no more minting in V6. Only drawing the
         // baseline reward from Network Fees account.
 
-        print(&700031);
+        // print(&700031);
 
         let coin = TransactionFee::get_transaction_fees_coins_amount(vm, reward_per);
 
@@ -258,11 +258,12 @@ address DiemFramework {
           Diem::destroy_zero(coin);
           return
         };
-        print(&700032);
+        // print(&700032);
 
         check_sum = check_sum + Diem::value(&coin);
-        print(&700033);
+        // print(&700033);
         let val = Vector::borrow(outgoing_set, i);
+        // print(val);
         DiemAccount::deposit<GAS> (
           @VMReserved,
           *val,
@@ -271,74 +272,13 @@ address DiemFramework {
           b"",
           false,
         );
-        print(&700034);
+        // print(&700034);
         i = i + 1;
       };
 
       // V6: validators get their consensus_reward from the network fees account (transaction fees account). Any remainder at end of epoch is burnt (by Epoch Boundary calling TransactionFee)
-
-      // CoreAddresses::assert_vm(vm);
-
-      // let len = Vector::length<address>(outgoing_set);
-      // let bal = TransactionFee::get_amount_to_distribute(vm);
-      // // leave fees in tx_fee if there isn't at least 1 gas coin per validator.
-      // if (bal < len) {
-      //   return
-      // };
-
-      // if (bal < 1) {
-      //   return
-      // };
-
-      // let i = 0;
-      // while (i < len) {
-      //   let node_address = *(Vector::borrow<address>(outgoing_set, i));
-      //   let fees = bal/len;
-        
-      //   DiemAccount::vm_deposit_with_metadata<GAS>(
-      //       vm,
-      //       node_address,
-      //       TransactionFee::get_transaction_fees_coins_amount<GAS>(vm, fees),
-      //       b"transaction fees",
-      //       b""
-      //   );
-      //   i = i + 1;
-      // };
     }
 
-    // V6: operators no longer send tower proofs.
-
-    // // Operators may run out of balance to submit txs for the Validator. 
-    // // This is true for mining, where the operator receives no network subsidy.
-    // fun refund_operator_tx_fees(vm: &signer, miner_addr: address) {
-    //     // get operator for validator
-    //     let oper_addr = ValidatorConfig::get_operator(miner_addr);
-    //     // count OWNER's proofs submitted
-    //     let proofs_in_epoch = TowerState::get_count_in_epoch(miner_addr);
-
-    //     let cost = 0;
-    //     // find cost from baseline
-    //     if (proofs_in_epoch > 0) {
-    //       cost = BASELINE_TX_COST * proofs_in_epoch;
-    //     };
-
-    //     // deduct from subsidy from Validator
-    //     // send payment to operator
-    //     if (cost > 0) {
-    //       let owner_balance = DiemAccount::balance<GAS>(miner_addr);
-    //       if (!(owner_balance > cost)) {
-    //         cost = owner_balance;
-    //       };
-
-    //       DiemAccount::vm_make_payment_no_limit<GAS>(
-    //         miner_addr,
-    //         oper_addr,
-    //         cost,
-    //         b"tx fee refund",
-    //         b"",
-    //         vm
-    //       );
-    //     };
-    // }
+    // NOTE: 0L: removed code: operators no longer send tower proofs.
 }
 }

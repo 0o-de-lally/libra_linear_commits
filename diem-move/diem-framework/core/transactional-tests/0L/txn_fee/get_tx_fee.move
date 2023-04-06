@@ -5,6 +5,6 @@ script {
     use DiemFramework::TransactionFee;
 
     fun main(vm: signer, _: signer) {
-        assert!(TransactionFee::get_amount_to_distribute(&vm) == 0, 735701);
+        assert!(TransactionFee::get_fees_collected() == 0, 735701);
     }
 }

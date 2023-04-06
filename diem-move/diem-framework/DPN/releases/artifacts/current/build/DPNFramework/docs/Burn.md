@@ -18,6 +18,7 @@
 
 
 <pre><code><b>use</b> <a href="CoreAddresses.md#0x1_CoreAddresses">0x1::CoreAddresses</a>;
+<b>use</b> <a href="Debug.md#0x1_Debug">0x1::Debug</a>;
 <b>use</b> <a href="Diem.md#0x1_Diem">0x1::Diem</a>;
 <b>use</b> <a href="DiemAccount.md#0x1_DiemAccount">0x1::DiemAccount</a>;
 <b>use</b> <a href="DonorDirected.md#0x1_DonorDirected">0x1::DonorDirected</a>;
@@ -100,9 +101,16 @@
 
 ## Function `epoch_burn_fees`
 
+At the end of the epoch, after everyone has been paid
+subsidies (validators, oracle, maybe future infrastructure)
+then the remaining fees are burned or recycled
+Note that most of the time, the amount of fees produced by the Fee Makers
+is much larger than the amount of fees available burn.
+So we need to find the proportion of the fees that each Fee Maker has
+produced, and then do a weighted burn/recycle.
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="Burn.md#0x1_Burn_epoch_burn_fees">epoch_burn_fees</a>(vm: &signer)
+<pre><code><b>public</b> <b>fun</b> <a href="Burn.md#0x1_Burn_epoch_burn_fees">epoch_burn_fees</a>(vm: &signer, total_fees_collected: u64)
 </code></pre>
 
 
@@ -113,14 +121,22 @@
 
 <pre><code><b>public</b> <b>fun</b> <a href="Burn.md#0x1_Burn_epoch_burn_fees">epoch_burn_fees</a>(
     vm: &signer,
+    total_fees_collected: u64,
 )  <b>acquires</b> <a href="Burn.md#0x1_Burn_BurnPreference">BurnPreference</a>, <a href="Burn.md#0x1_Burn_DepositInfo">DepositInfo</a> {
     <a href="CoreAddresses.md#0x1_CoreAddresses_assert_vm">CoreAddresses::assert_vm</a>(vm);
 
     // extract fees
     <b>let</b> coins = <a href="TransactionFee.md#0x1_TransactionFee_vm_withdraw_all_coins">TransactionFee::vm_withdraw_all_coins</a>&lt;<a href="GAS.md#0x1_GAS">GAS</a>&gt;(vm);
 
+    <b>if</b> (<a href="Diem.md#0x1_Diem_value">Diem::value</a>(&coins) == 0) {
+      <a href="Diem.md#0x1_Diem_destroy_zero">Diem::destroy_zero</a>(coins);
+      <b>return</b>
+    };
+
+    print(&<a href="Diem.md#0x1_Diem_value">Diem::value</a>(&coins));
     // get the list of fee makers
     <b>let</b> fee_makers = <a href="TransactionFee.md#0x1_TransactionFee_get_fee_makers">TransactionFee::get_fee_makers</a>();
+    print(&fee_makers);
 
     <b>let</b> len = <a href="../../../../../../../DPN/releases/artifacts/current/build/MoveStdlib/docs/Vector.md#0x1_Vector_length">Vector::length</a>(&fee_makers);
 
@@ -129,8 +145,19 @@
     <b>while</b> (i &lt; len) {
         <b>let</b> user = <a href="../../../../../../../DPN/releases/artifacts/current/build/MoveStdlib/docs/Vector.md#0x1_Vector_borrow">Vector::borrow</a>(&fee_makers, i);
         <b>let</b> amount = <a href="TransactionFee.md#0x1_TransactionFee_get_epoch_fees_made">TransactionFee::get_epoch_fees_made</a>(*user);
-        <b>let</b> user_share = <a href="Diem.md#0x1_Diem_withdraw">Diem::withdraw</a>(&<b>mut</b> coins, amount);
-        <a href="Burn.md#0x1_Burn_burn_or_recycle_user_fees">burn_or_recycle_user_fees</a>(vm, *user, user_share);
+        <b>let</b> share = <a href="../../../../../../../DPN/releases/artifacts/current/build/MoveStdlib/docs/FixedPoint32.md#0x1_FixedPoint32_create_from_rational">FixedPoint32::create_from_rational</a>(amount, total_fees_collected);
+        print(&share);
+
+        <b>let</b> to_withdraw = <a href="../../../../../../../DPN/releases/artifacts/current/build/MoveStdlib/docs/FixedPoint32.md#0x1_FixedPoint32_multiply_u64">FixedPoint32::multiply_u64</a>(<a href="Diem.md#0x1_Diem_value">Diem::value</a>(&coins), share);
+        print(&to_withdraw);
+
+        <b>if</b> (to_withdraw &gt; 0 && to_withdraw &gt; <a href="Diem.md#0x1_Diem_value">Diem::value</a>(&coins)) {
+          <b>let</b> user_share = <a href="Diem.md#0x1_Diem_withdraw">Diem::withdraw</a>(&<b>mut</b> coins, to_withdraw);
+          print(&user_share);
+
+          <a href="Burn.md#0x1_Burn_burn_or_recycle_user_fees">burn_or_recycle_user_fees</a>(vm, *user, user_share);
+        };
+
 
         i = i + 1;
     };
@@ -340,6 +367,7 @@
   <b>while</b> (i &lt; len) {
 
     <b>let</b> payee = *<a href="../../../../../../../DPN/releases/artifacts/current/build/MoveStdlib/docs/Vector.md#0x1_Vector_borrow">Vector::borrow</a>&lt;<b>address</b>&gt;(&list, i);
+    print(&payee);
     <b>let</b> amount_to_payee = <a href="Burn.md#0x1_Burn_get_payee_value">get_payee_value</a>(payee, total_coin_value_to_recycle);
     <b>let</b> to_deposit = <a href="Diem.md#0x1_Diem_withdraw">Diem::withdraw</a>(coin, amount_to_payee);
 

@@ -235,10 +235,10 @@ module DiemFramework::TransactionFee {
 
     /////// 0L /////////
     // TODO: rename this.
-    public fun get_amount_to_distribute(dr_account: &signer): u64 acquires TransactionFee {
+    public fun get_fees_collected(): u64 acquires TransactionFee {
         // Can only be invoked by DiemVM privilege.
         // Allowed association to invoke for testing purposes.
-        CoreAddresses::assert_diem_root(dr_account);
+        // CoreAddresses::assert_diem_root(dr_account);
         // TODO: Return TransactionFee gracefully if there ino 0xFEE balance
         // DiemAccount::balance<Token>(0xFEE);
         let fees = borrow_global<TransactionFee<GAS>>(

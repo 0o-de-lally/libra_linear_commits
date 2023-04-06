@@ -45,7 +45,7 @@ address DiemFramework{
         use Std::Option;
         use Std::FixedPoint32;
         use DiemFramework::DiemConfig;
-        use DiemFramework::Debug::print;
+        // use DiemFramework::Debug::print;
         use DiemFramework::Testnet;
         use DiemFramework::Diem;
         use DiemFramework::GAS::GAS;
@@ -211,7 +211,7 @@ address DiemFramework{
             let pledgers = *&borrow_global<BeneficiaryPolicy>(Signer::address_of(sig_beneficiary)).pledgers;
 
             let amount_available = *&borrow_global<BeneficiaryPolicy>(Signer::address_of(sig_beneficiary)).amount_available;
-            print(&amount_available);
+            // print(&amount_available);
 
             if (amount_available < 1) {
               return Option::none<Diem::Diem<GAS>>()
@@ -268,33 +268,33 @@ address DiemFramework{
               let pledge_state = borrow_global_mut<MyPledges>(*payer);
 
               let pledge_account = Vector::borrow_mut(&mut pledge_state.list, idx);
-              print(&66);
-              print(&pledge_account.amount);
+              // print(&66);
+              // print(&pledge_account.amount);
               if (
                 pledge_account.amount > 0 &&
                 pledge_account.amount >= amount
                 
                 ) {
-                  print(&1101);
+                  // print(&1101);
                   pledge_account.amount = pledge_account.amount - amount;
-                  print(&1102);
+                  // print(&1102);
                   pledge_account.lifetime_withdrawn = pledge_account.lifetime_withdrawn + amount;
-                  print(&1103);
+                  // print(&1103);
                   
                   let coin = Diem::withdraw(&mut pledge_account.pledge, amount);
-                  print(&coin);
+                  // print(&coin);
                   // return coin
 
                   // update the beneficiaries state too
 
                   let bp = borrow_global_mut<BeneficiaryPolicy>(*address_of_beneficiary);
 
-                  print(&bp.amount_available);
+                  // print(&bp.amount_available);
                   bp.amount_available = bp.amount_available - amount;
-                  print(&1104);
-                  print(&bp.amount_available);
+                  // print(&1104);
+                  // print(&bp.amount_available);
                   bp.lifetime_withdrawn = bp.lifetime_withdrawn + amount;
-                  print(&1105);
+                  // print(&1105);
 
                   return Option::some(coin)
                 };
@@ -319,33 +319,33 @@ address DiemFramework{
 
               let amount_withdraw = FixedPoint32::multiply_u64(pledge_account.amount, *pct);
 
-              print(&66);
-              print(&pledge_account.amount);
+              // print(&66);
+              // print(&pledge_account.amount);
               if (
                 pledge_account.amount > 0 &&
                 pledge_account.amount >= amount_withdraw
                 
                 ) {
-                  print(&1101);
+                  // print(&1101);
                   pledge_account.amount = pledge_account.amount - amount_withdraw;
-                  print(&1102);
+                  // print(&1102);
                   pledge_account.lifetime_withdrawn = pledge_account.lifetime_withdrawn + amount_withdraw;
-                  print(&1103);
+                  // print(&1103);
                   
                   let coin = Diem::withdraw(&mut pledge_account.pledge, amount_withdraw);
-                  print(&coin);
+                  // print(&coin);
                   // return coin
 
                   // update the beneficiaries state too
 
                   let bp = borrow_global_mut<BeneficiaryPolicy>(*address_of_beneficiary);
 
-                  print(&bp.amount_available);
+                  // print(&bp.amount_available);
                   bp.amount_available = bp.amount_available - amount_withdraw;
-                  print(&1104);
-                  print(&bp.amount_available);
+                  // print(&1104);
+                  // print(&bp.amount_available);
                   bp.lifetime_withdrawn = bp.lifetime_withdrawn + amount_withdraw;
-                  print(&1105);
+                  // print(&1105);
 
                   return Option::some(coin)
                 };
@@ -375,7 +375,7 @@ address DiemFramework{
             // The first voter to cross the threshold  also
             // triggers the dissolution.
             if (tally_vote(address_of_beneficiary)) {
-              print(&444);
+              // print(&444);
               dissolve_beneficiary_project(address_of_beneficiary);
             };
         }
@@ -436,17 +436,17 @@ address DiemFramework{
         // Danger: this function must remain private!
         // private function to dissolve the beneficiary project, and return all funds to the pledgers.
         fun dissolve_beneficiary_project(address_of_beneficiary: address) acquires MyPledges, BeneficiaryPolicy {
-            print(&888888888);
+            // print(&888888888);
             let pledgers = *&borrow_global<BeneficiaryPolicy>(address_of_beneficiary).pledgers;
 
             let is_burn = *&borrow_global<BeneficiaryPolicy>(address_of_beneficiary).burn_funds_on_revoke;
 
             let i = 0;
             while (i < Vector::length(&pledgers)) {
-                print(&888);
+                // print(&888);
                 let pledge_account = Vector::borrow(&pledgers, i);
                 let user_pledge_balance = get_user_pledge_amount(pledge_account, &address_of_beneficiary);
-                print(&user_pledge_balance);
+                // print(&user_pledge_balance);
                 let c = withdraw_from_one_pledge_account(&address_of_beneficiary, pledge_account, user_pledge_balance);
                 // print(&coin);
 
@@ -476,7 +476,7 @@ address DiemFramework{
 
           let bp = borrow_global_mut<BeneficiaryPolicy>(address_of_beneficiary);
           bp.revoked = true;
-          print(&bp.revoked);
+          // print(&bp.revoked);
 
           // otherwise leave the information as-is for reference purposes
         }

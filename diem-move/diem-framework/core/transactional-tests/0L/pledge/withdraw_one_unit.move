@@ -60,6 +60,7 @@ script {
     // get rid of these coins
     DiemAccount::vm_deposit_with_metadata(
       &vm,
+      @VMReserved,
       @Alice,
       coins,
       b"", 

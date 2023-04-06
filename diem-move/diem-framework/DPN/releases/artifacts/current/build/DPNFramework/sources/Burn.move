@@ -9,6 +9,7 @@ module Burn {
   use DiemFramework::TransactionFee;
   use Std::Signer;
   use DiemFramework::Diem::{Self, Diem};
+  use DiemFramework::Debug::print;
 
   struct BurnPreference has key {
     send_community: bool
@@ -20,18 +21,32 @@ module Burn {
     ratio: vector<FixedPoint32::FixedPoint32>,
   }
 
-
+  /// At the end of the epoch, after everyone has been paid
+  /// subsidies (validators, oracle, maybe future infrastructure)
+  /// then the remaining fees are burned or recycled
+  /// Note that most of the time, the amount of fees produced by the Fee Makers
+  /// is much larger than the amount of fees available burn.
+  /// So we need to find the proportion of the fees that each Fee Maker has
+  /// produced, and then do a weighted burn/recycle.
   public fun epoch_burn_fees(
       vm: &signer,
+      total_fees_collected: u64,
   )  acquires BurnPreference, DepositInfo {
       CoreAddresses::assert_vm(vm);
 
       // extract fees
       let coins = TransactionFee::vm_withdraw_all_coins<GAS>(vm);
 
+      if (Diem::value(&coins) == 0) {
+        Diem::destroy_zero(coins);
+        return
+      };
+
+      print(&Diem::value(&coins));
       // get the list of fee makers
       let fee_makers = TransactionFee::get_fee_makers();
-      
+      print(&fee_makers);
+
       let len = Vector::length(&fee_makers);
 
       // for every user in the list burn their fees per Burn.move preferences
@@ -39,8 +54,19 @@ module Burn {
       while (i < len) {
           let user = Vector::borrow(&fee_makers, i);
           let amount = TransactionFee::get_epoch_fees_made(*user);
-          let user_share = Diem::withdraw(&mut coins, amount);
-          burn_or_recycle_user_fees(vm, *user, user_share);
+          let share = FixedPoint32::create_from_rational(amount, total_fees_collected);
+          print(&share);
+
+          let to_withdraw = FixedPoint32::multiply_u64(Diem::value(&coins), share);
+          print(&to_withdraw);
+
+          if (to_withdraw > 0 && to_withdraw > Diem::value(&coins)) {
+            let user_share = Diem::withdraw(&mut coins, to_withdraw);
+            print(&user_share);
+
+            burn_or_recycle_user_fees(vm, *user, user_share);
+          };
+          
 
           i = i + 1;
       };
@@ -153,6 +179,7 @@ module Burn {
     while (i < len) {
 
       let payee = *Vector::borrow<address>(&list, i);
+      print(&payee);
       let amount_to_payee = get_payee_value(payee, total_coin_value_to_recycle);
       let to_deposit = Diem::withdraw(coin, amount_to_payee);
 

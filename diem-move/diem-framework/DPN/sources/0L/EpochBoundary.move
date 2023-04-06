@@ -30,9 +30,7 @@ module EpochBoundary {
     use DiemFramework::DonorDirected;
     use DiemFramework::MusicalChairs;
     use DiemFramework::InfraEscrow;
-    // use DiemFramework::PledgeAccounts;
-    // use DiemFramework::Burn;
-    // use Std::FixedPoint32;
+    // use DiemFramework::Debug::print;
 
 
     //// V6 ////
@@ -42,7 +40,6 @@ module EpochBoundary {
 
     // TODO: this will depend on an adjustment algo.
     // const MOCK_BASELINE_CONSENSUS_FEES: u64 = 1000000;
-
 
     // This function is called by block-prologue once after n blocks.
     // Function code: 01. Prefix: 180001
@@ -63,6 +60,8 @@ module EpochBoundary {
         
         // print(&800300);
 
+        // get the total fees produced before we start spending them.
+        let total_fees = TransactionFee::get_fees_collected();
         // Get the consensus reward established at the beginning of the epoch
         // so we know what to pay people
         let (reward, _, _) = ProofOfFee::get_consensus_reward();   
@@ -73,7 +72,7 @@ module EpochBoundary {
         
         // print(&800500);
         
-        process_validators(vm, reward, &outgoing_compliant_set);
+        process_validators(vm, reward, &outgoing_compliant_set, total_fees);
         // print(&800600);
 
         // process the non performing nodes: jail
@@ -87,15 +86,11 @@ module EpochBoundary {
         // TODO: implement what happens to the matching donation algo
         // depending on the validator's preferences.
         // TransactionFee::ol_burn_fees(vm);
-        // print(&800700);
 
 
         let proposed_set = propose_new_set(vm, &outgoing_compliant_set);
 
-
-        // Update all slow wallet limits
-        DiemAccount::slow_wallet_epoch_drip(vm, Globals::get_unlock()); // todo
-        // print(&801000);
+        // print(&800700);
 
         root_service_billing(vm);
         // print(&801000);
@@ -160,11 +155,14 @@ module EpochBoundary {
     }
 
     fun process_validators(
-        vm: &signer, subsidy_units: u64, outgoing_compliant_set: &vector<address>
+        vm: &signer,
+        subsidy_units: u64,
+        outgoing_compliant_set: &vector<address>,
+        fees_collected: u64,
     ) {
         // Process outgoing validators:
         // Distribute Transaction fees and subsidy payments to all outgoing validators
-        
+
         if (Vector::is_empty<address>(outgoing_compliant_set)) return;
 
         // don't pay while we are in recovery mode, since that creates
@@ -176,7 +174,9 @@ module EpochBoundary {
         // after everyone is paid from the chain's Fee account
         // we can burn the excess fees from the epoch
         Burn::reset_ratios(vm);
-        Burn::epoch_burn_fees(vm);
+
+        Burn::epoch_burn_fees(vm, fees_collected);
+
     }
 
     fun process_jail(vm: &signer, outgoing_compliant_set: &vector<address>) {

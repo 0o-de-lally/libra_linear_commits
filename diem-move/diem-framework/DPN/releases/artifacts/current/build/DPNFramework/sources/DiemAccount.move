@@ -16,6 +16,7 @@ module DiemFramework::DiemAccount {
     friend DiemFramework::PledgeAccounts;
     friend DiemFramework::Subsidy;
     friend DiemFramework::Burn;
+    friend DiemFramework::DonorDirected;
 
 
     use DiemFramework::AccountFreezing;
@@ -3700,8 +3701,15 @@ module DiemFramework::DiemAccount {
 
     //////// 0L ////////
     // init struct for storing cumulative deposits, for community wallets
-    public fun init_cumulative_deposits(sender: &signer, starting_balance: u64) {
+    // TODO: set true or false, that the account gets current balance or 
+    // starts at zero.
+    public(friend) fun init_cumulative_deposits(sender: &signer, use_starting_balance: bool) acquires Balance {
       let addr = Signer::address_of(sender);
+
+      let starting_balance = if (use_starting_balance) {
+        balance<GAS>(addr) 
+      } else { 0 };
+      
 
       if (!exists<CumulativeDeposits>(addr)) {
         move_to<CumulativeDeposits>(sender, CumulativeDeposits {
@@ -3709,6 +3717,11 @@ module DiemFramework::DiemAccount {
           index: starting_balance,
         })
       };
+    }
+
+    public fun vm_migrate_cumulative_deposits(vm: &signer, sender: &signer, use_starting_balance: bool) acquires Balance {
+      CoreAddresses::assert_diem_root(vm);
+      init_cumulative_deposits(sender, use_starting_balance);
     }
 
     fun maybe_update_deposit(payer: address, payee: address, deposit_value: u64) acquires CumulativeDeposits {

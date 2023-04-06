@@ -27,7 +27,7 @@ script {
       let c_value = Diem::value(&c);
       TransactionFee::pay_fee(c);
 
-      let v = TransactionFee::get_amount_to_distribute(&vm);
+      let v = TransactionFee::get_fees_collected();
       assert!( c_value == v, 735701);
       // implied that the other validators failed to sign blocks
         
